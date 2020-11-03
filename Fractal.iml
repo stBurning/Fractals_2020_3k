@@ -21,6 +21,7 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="module" module-name="Math" />
+    <orderEntry type="module" module-name="Complex" />
+    <orderEntry type="module" module-name="GraphicsPanel" />
   </component>
 </module>
