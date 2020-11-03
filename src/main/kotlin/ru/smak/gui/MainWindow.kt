@@ -1,8 +1,10 @@
 package ru.smak.gui
 
 import ru.smak.gui.components.GraphicsPanel
+import ru.smak.gui.graphics.FractalPainter
 import ru.smak.gui.graphics.convertation.CartesianScreenPlane
 import ru.smak.gui.graphics.convertation.Converter
+import ru.smak.math.fractals.Mandelbrot
 import java.awt.Color
 import java.awt.Dimension
 import java.awt.event.*
@@ -35,7 +37,9 @@ class MainWindow : JFrame(){
             )
             .addGap(4))
         layout = gl
+
         pack()
+
         val plane = CartesianScreenPlane(
             mainPanel.width, mainPanel.height,
             -2.0, 1.0, -1.0, 1.0
@@ -57,8 +61,11 @@ class MainWindow : JFrame(){
                 //mainPanel.repaint()
             }
         })
+        val fp = FractalPainter(plane)
+        val fractal = Mandelbrot()
+        fp.fractalTest = fractal::isInSet
 
-        //mainPanel.addPainter(dnp)
+        mainPanel.addPainter(fp)
 
     }
 }

@@ -3,6 +3,9 @@ package ru.smak.math
 import kotlin.math.absoluteValue
 
 class Complex(var re: Double, var im: Double) {
+
+    constructor(): this(0.0, 0.0)
+
     operator fun plus(c: Complex)  =
         Complex(re+c.re, im+c.im)
     operator fun minus(c: Complex) =
