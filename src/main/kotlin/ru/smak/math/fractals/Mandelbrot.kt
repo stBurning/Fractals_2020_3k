@@ -25,7 +25,8 @@ class Mandelbrot {
     fun isInSet(c: Complex): Boolean{
         val z = Complex()
         for (i in 1..maxIters){
-            z = (z pow 2) + c
+            z powAssign 2
+            z += c
             if (z.abs2() > r2) return false
         }
         return true
