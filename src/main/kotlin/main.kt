@@ -1,5 +1,6 @@
-import ru.smak.math.Complex
+import ru.smak.gui.MainWindow
 
 fun main() {
-    val c = Complex(2.0, 3.0)
+    val w = MainWindow()
+    w.isVisible = true
 }
