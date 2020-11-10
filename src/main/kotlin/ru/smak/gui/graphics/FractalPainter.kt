@@ -3,15 +3,17 @@ package ru.smak.gui.graphics
 import ru.smak.gui.graphics.convertation.CartesianScreenPlane
 import ru.smak.gui.graphics.convertation.Converter
 import ru.smak.math.Complex
-import ru.smak.math.fractals.Mandelbrot
 import java.awt.Color
 import java.awt.Graphics
+import kotlin.math.abs
+import kotlin.math.max
 
 class FractalPainter(
     val plane: CartesianScreenPlane
     ) : Painter {
 
-    var fractalTest : ((Complex)->Boolean)? = null
+    var fractalTest : ((Complex)->Float)? = null
+    var getColor: ((Float)->Color) = { x -> Color(x, x, x)}
 
     /**
      * Рисование фрактала
@@ -28,7 +30,7 @@ class FractalPainter(
                         Converter.yScr2Crt(j, plane)
                     )
                 ) ?: return
-                g.color = if (r) Color.BLACK else Color.WHITE
+                g.color = if (r eq 1F) Color.BLACK else getColor(r)
                 g.fillRect(i, j, 1, 1)
             }
         }
@@ -36,3 +38,8 @@ class FractalPainter(
         //println((ms2 - ms1)/1000.0)
     }
 }
+
+private infix fun Float.eq(other: Float) =
+        abs(this - other) < max(Math.ulp(this), Math.ulp(other)) * 2
+private infix fun Float.neq(other: Float) =
+        abs(this - other) > max(Math.ulp(this), Math.ulp(other)) * 2

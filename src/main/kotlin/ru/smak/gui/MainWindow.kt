@@ -1,7 +1,7 @@
 package ru.smak.gui
 
 import ru.smak.gui.components.GraphicsPanel
-import ru.smak.gui.graphics.FractalPainter
+import ru.smak.gui.graphics.*
 import ru.smak.gui.graphics.convertation.CartesianScreenPlane
 import ru.smak.gui.graphics.convertation.Converter
 import ru.smak.math.fractals.Mandelbrot
@@ -52,20 +52,36 @@ class MainWindow : JFrame(){
             }
         })
 
-        mainPanel.addMouseListener(object: MouseAdapter(){
-            override fun mouseClicked(e: MouseEvent?) {
-                if (e == null) return
-                val cx = Converter.xScr2Crt(e.x, plane)
-                val cy = Converter.yScr2Crt(e.y, plane)
+        val mfp = MouseFramePainter(mainPanel.graphics)
 
-                //mainPanel.repaint()
+        mainPanel.addMouseListener(object: MouseAdapter(){
+            override fun mousePressed(e: MouseEvent?) {
+                e?.let {
+                    mfp.isVisible = true
+                    mfp.startPoint = it.point
+                }
+            }
+            override fun mouseReleased(e: MouseEvent?) {
+                mfp.isVisible = false
+                e?.let{
+                    mfp.currentPoint = it.point
+                }
             }
         })
+
+        mainPanel.addMouseMotionListener(object : MouseAdapter(){
+            override fun mouseDragged(e: MouseEvent?) {
+                e?.let{
+                    mfp.currentPoint = it.point
+                }
+            }
+        })
+
         val fp = FractalPainter(plane)
         val fractal = Mandelbrot()
         fp.fractalTest = fractal::isInSet
+        fp.getColor = ::colorScheme4
 
         mainPanel.addPainter(fp)
-
     }
 }
