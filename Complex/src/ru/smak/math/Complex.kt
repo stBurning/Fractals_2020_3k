@@ -221,7 +221,11 @@ class Complex(var re: Double, var im: Double) {
     }
 }
 
-private infix fun Double.eq(other: Double) = abs(this - other) < max(Math.ulp(this), Math.ulp(other)) * 2
-private infix fun Double.neq(other: Double) = abs(this - other) > max(Math.ulp(this), Math.ulp(other)) * 2
-private infix fun Double.ge(other: Double) = this > other || this.eq(other)
-private infix fun Double.le(other: Double) = this < other || this.eq(other)
+private infix fun Double.eq(other: Double) =
+        abs(this - other) < max(Math.ulp(this), Math.ulp(other)) * 2
+private infix fun Double.neq(other: Double) =
+        abs(this - other) > max(Math.ulp(this), Math.ulp(other)) * 2
+private infix fun Double.ge(other: Double) =
+        this > other || this.eq(other)
+private infix fun Double.le(other: Double) =
+        this < other || this.eq(other)

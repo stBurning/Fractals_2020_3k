@@ -18,7 +18,7 @@ class FractalPainter(
      * @param g графический контекст для рисования
      */
     override fun paint(g: Graphics?) {
-        val ms1 = System.currentTimeMillis()
+        //val ms1 = System.currentTimeMillis()
         if (fractalTest==null || g==null) return
         for (i in 0..plane.width){
             for (j in 0..plane.height){
@@ -32,7 +32,7 @@ class FractalPainter(
                 g.fillRect(i, j, 1, 1)
             }
         }
-        val ms2 = System.currentTimeMillis()
-        println((ms2 - ms1)/1000.0)
+        //val ms2 = System.currentTimeMillis()
+        //println((ms2 - ms1)/1000.0)
     }
 }
