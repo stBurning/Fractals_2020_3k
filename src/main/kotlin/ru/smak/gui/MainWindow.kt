@@ -20,23 +20,21 @@ class MainWindow : JFrame(){
         title = "Построение множества Мандельброта"
         minimumSize = Dimension(700, 700)
         mainPanel = GraphicsPanel()
-        mainPanel.background = Color.WHITE
-        val gl = GroupLayout(contentPane)
 
-        gl.setVerticalGroup(gl.createSequentialGroup()
-            .addGap(4)
-            .addComponent(mainPanel, minSize.height, minSize.height, GroupLayout.DEFAULT_SIZE)
-            .addGap(4)
-        )
-
-        gl.setHorizontalGroup(gl.createSequentialGroup()
-            .addGap(4)
-            .addGroup(
-                gl.createParallelGroup()
-                    .addComponent(mainPanel, minSize.width, minSize.width, GroupLayout.DEFAULT_SIZE)
+        layout = GroupLayout(contentPane).apply{
+            setVerticalGroup(createSequentialGroup()
+                    .addGap(4)
+                    .addComponent(mainPanel, minSize.height, minSize.height, GroupLayout.DEFAULT_SIZE)
+                    .addGap(4)
             )
-            .addGap(4))
-        layout = gl
+            setHorizontalGroup(createSequentialGroup()
+                    .addGap(4)
+                    .addGroup(
+                            createParallelGroup()
+                                    .addComponent(mainPanel, minSize.width, minSize.width, GroupLayout.DEFAULT_SIZE)
+                    )
+                    .addGap(4))
+        }
 
         pack()
 
@@ -45,43 +43,56 @@ class MainWindow : JFrame(){
             -2.0, 1.0, -1.0, 1.0
         )
 
-        mainPanel.addComponentListener(object : ComponentAdapter() {
-            override fun componentResized(e: ComponentEvent?) {
-                plane.realWidth = mainPanel.width
-                plane.realHeight = mainPanel.height
-            }
-        })
-
-        val mfp = MouseFramePainter(mainPanel.graphics)
-
-        mainPanel.addMouseListener(object: MouseAdapter(){
-            override fun mousePressed(e: MouseEvent?) {
-                e?.let {
-                    mfp.isVisible = true
-                    mfp.startPoint = it.point
-                }
-            }
-            override fun mouseReleased(e: MouseEvent?) {
-                mfp.isVisible = false
-                e?.let{
-                    mfp.currentPoint = it.point
-                }
-            }
-        })
-
-        mainPanel.addMouseMotionListener(object : MouseAdapter(){
-            override fun mouseDragged(e: MouseEvent?) {
-                e?.let{
-                    mfp.currentPoint = it.point
-                }
-            }
-        })
-
-        val fp = FractalPainter(plane)
+        val mfp = SelectionFramePainter(mainPanel.graphics)
         val fractal = Mandelbrot()
+        val fp = FractalPainter(plane)
         fp.fractalTest = fractal::isInSet
         fp.getColor = ::colorScheme4
 
-        mainPanel.addPainter(fp)
+        with (mainPanel){
+            background = Color.WHITE
+            addComponentListener(object : ComponentAdapter() {
+                override fun componentResized(e: ComponentEvent?) {
+                    plane.realWidth = mainPanel.width
+                    plane.realHeight = mainPanel.height
+                    mfp.g = mainPanel.graphics
+                }
+            })
+            addMouseListener(object: MouseAdapter(){
+                override fun mousePressed(e: MouseEvent?) {
+                    e?.let {
+                        mfp.isVisible = true
+                        mfp.startPoint = it.point
+                    }
+                }
+                override fun mouseReleased(e: MouseEvent?) {
+                    e?.let{
+                        mfp.currentPoint = it.point
+                    }
+                    mfp.isVisible = false
+                    mfp.selectionRect?.apply {
+                        val xMin = Converter.xScr2Crt(x, plane)
+                        val xMax = Converter.xScr2Crt(x + width, plane)
+                        val yMin = Converter.yScr2Crt(y + height, plane)
+                        val yMax = Converter.yScr2Crt(y, plane)
+                        plane.also{
+                            it.xMin = xMin
+                            it.xMax = xMax
+                            it.yMin = yMin
+                            it.yMax = yMax
+                        }
+                    }
+                    repaint()
+                }
+            })
+            addMouseMotionListener(object : MouseMotionAdapter(){
+                override fun mouseDragged(e: MouseEvent?) {
+                    e?.let{
+                        mfp.currentPoint = it.point
+                    }
+                }
+            })
+            addPainter(fp)
+        }
     }
 }
