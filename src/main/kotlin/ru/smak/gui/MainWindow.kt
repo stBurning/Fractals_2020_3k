@@ -47,7 +47,7 @@ class MainWindow : JFrame(){
         val fractal = Mandelbrot()
         val fp = FractalPainter(plane)
         fp.isInSet = fractal::isInSet
-        fp.getColor = ::colorScheme4
+        fp.getColor = ::colorScheme5
         fp.addImageReadyListener { mainPanel.repaint() }
 
         with (mainPanel){

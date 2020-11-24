@@ -30,3 +30,10 @@ fun colorScheme4(x: Float): Color {
     val g = 1F-abs(cos(12+6*sin(15*x))*cos(13+2*sin(28*x)))
     return Color(r, g, b)
 }
+
+fun colorScheme5(x: Float): Color{
+    val b = 0.5F + 0.5F*cos(3 + x*0.15).toFloat()
+    val r = 0.5F + 0.5F*cos(3 + x*0.15 + 0.6).toFloat()
+    val g = 0.5F + 0.5F*cos(3 + x*0.15 + 1.0).toFloat()
+    return Color(r, g, b)
+}

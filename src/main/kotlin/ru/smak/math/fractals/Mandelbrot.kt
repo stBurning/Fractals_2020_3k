@@ -1,8 +1,7 @@
 package ru.smak.math.fractals
 
 import ru.smak.math.Complex
-import kotlin.math.abs
-import kotlin.math.max
+import kotlin.math.*
 
 /**
  * Класс множества Мандельброта
@@ -36,10 +35,13 @@ class Mandelbrot {
         for (i in 1..maxIters){
             z powAssign 2
             z += c
-            //z = (z pow 2) + c
-            //if (z.abs() > 2.0) return false
-            if (z.abs2() > r2) return i.toFloat()/maxIters.toFloat()
+            if (z.abs2() > r2)
+                //return i.toFloat() - log2(log2(z.abs2())).toFloat()+4.0F
+                return i.toFloat() -
+                        log(log(z.abs(), E)/log(maxIters.toDouble(),E), E).toFloat()/
+                        log(2.0, E).toFloat()
+                //i.toFloat()/maxIters.toFloat()
         }
-        return 1F
+        return 0F
     }
 }

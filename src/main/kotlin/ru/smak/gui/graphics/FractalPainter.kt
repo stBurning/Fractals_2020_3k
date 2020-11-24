@@ -6,6 +6,7 @@ import ru.smak.math.Complex
 import java.awt.Color
 import java.awt.Graphics
 import java.awt.image.BufferedImage
+import java.lang.Thread.sleep
 import kotlin.concurrent.thread
 import kotlin.math.abs
 import kotlin.math.max
@@ -49,6 +50,7 @@ class FractalPainter(
 
         var thread: Thread? = null
         private set
+
         private val stripImg: BufferedImage
         private val stripWidth: Int = plane.width / stripCount
         private val b: Int
@@ -94,7 +96,6 @@ class FractalPainter(
 
     private fun finished() {
         if (!stop) {
-            partsDone = 0
             savedImage = BufferedImage(plane.width, plane.height, BufferedImage.TYPE_INT_RGB)
             synchronized(stripList) {
                 savedImage.graphics.drawImage(bi, 0, 0, null)
