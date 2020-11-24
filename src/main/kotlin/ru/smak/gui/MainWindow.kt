@@ -46,8 +46,9 @@ class MainWindow : JFrame(){
         val mfp = SelectionFramePainter(mainPanel.graphics)
         val fractal = Mandelbrot()
         val fp = FractalPainter(plane)
-        fp.fractalTest = fractal::isInSet
+        fp.isInSet = fractal::isInSet
         fp.getColor = ::colorScheme4
+        fp.addImageReadyListener { mainPanel.repaint() }
 
         with (mainPanel){
             background = Color.WHITE
@@ -56,6 +57,7 @@ class MainWindow : JFrame(){
                     plane.realWidth = mainPanel.width
                     plane.realHeight = mainPanel.height
                     mfp.g = mainPanel.graphics
+                    mainPanel.repaint()
                 }
             })
             addMouseListener(object: MouseAdapter(){
@@ -71,15 +73,17 @@ class MainWindow : JFrame(){
                     }
                     mfp.isVisible = false
                     mfp.selectionRect?.apply {
-                        val xMin = Converter.xScr2Crt(x, plane)
-                        val xMax = Converter.xScr2Crt(x + width, plane)
-                        val yMin = Converter.yScr2Crt(y + height, plane)
-                        val yMax = Converter.yScr2Crt(y, plane)
-                        plane.also{
-                            it.xMin = xMin
-                            it.xMax = xMax
-                            it.yMin = yMin
-                            it.yMax = yMax
+                        if (width > 3 && height > 3) {
+                            val xMin = Converter.xScr2Crt(x, plane)
+                            val xMax = Converter.xScr2Crt(x + width, plane)
+                            val yMin = Converter.yScr2Crt(y + height, plane)
+                            val yMax = Converter.yScr2Crt(y, plane)
+                            plane.let {
+                                it.xMin = xMin
+                                it.xMax = xMax
+                                it.yMin = yMin
+                                it.yMax = yMax
+                            }
                         }
                     }
                     repaint()
