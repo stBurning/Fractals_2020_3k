@@ -5,6 +5,7 @@
       <module fileurl="file://$PROJECT_DIR$/Complex/Complex.iml" filepath="$PROJECT_DIR$/Complex/Complex.iml" />
       <module fileurl="file://$PROJECT_DIR$/Fractal.iml" filepath="$PROJECT_DIR$/Fractal.iml" />
       <module fileurl="file://$PROJECT_DIR$/GraphicsPanel/GraphicsPanel.iml" filepath="$PROJECT_DIR$/GraphicsPanel/GraphicsPanel.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/ScreenRecorder.iml" filepath="$PROJECT_DIR$/.idea/modules/ScreenRecorder.iml" />
     </modules>
   </component>
 </project>
