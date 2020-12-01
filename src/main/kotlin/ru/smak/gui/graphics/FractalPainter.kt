@@ -53,13 +53,11 @@ class FractalPainter(
 
         private val stripImg: BufferedImage
         private val stripWidth: Int = plane.width / stripCount
-        private val b: Int
+        private val b: Int = stripId * stripWidth
         private val e: Int
-        private val add: Int
+        private val add: Int = if (stripId == (stripCount - 1)) {plane.width % stripCount} else 0
 
         init {
-            b = stripId * stripWidth
-            add = if (stripId == (stripCount - 1)) {plane.width % stripCount} else 0
             e = b + stripWidth + add
             stripImg = BufferedImage(stripWidth + add, plane.height, BufferedImage.TYPE_INT_RGB)
         }
