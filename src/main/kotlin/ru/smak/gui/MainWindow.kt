@@ -9,12 +9,16 @@ import java.awt.Color
 import java.awt.Dimension
 import java.awt.event.*
 import javax.swing.GroupLayout
+import javax.swing.JButton
 import javax.swing.JFrame
 
 class MainWindow : JFrame(){
 
+    private val history = History()
     private val minSize = Dimension(300, 200)
     private val mainPanel: GraphicsPanel
+    val ButtonBack = JButton("Назад")
+    val ButtonReset = JButton("Сбросить")
     init{
         defaultCloseOperation = EXIT_ON_CLOSE
         title = "Построение множества Мандельброта"
@@ -50,6 +54,29 @@ class MainWindow : JFrame(){
         fp.getColor = ::colorScheme5
         fp.addImageReadyListener { mainPanel.repaint() }
 
+        fun updatePlane(xMin: Double, xMax: Double, yMin: Double, yMax: Double) {
+            plane.also {
+                it.xMin = xMin
+                it.xMax = xMax
+                it.yMin = yMin
+                it.yMax = yMax
+            }
+        }
+
+        fun onUndo() {
+            val coords = history.undo()
+            if (coords != null) {
+                updatePlane(coords.xMin, coords.xMax, coords.yMin, coords.yMax)
+                repaint()
+            }
+        }
+
+        fun onReset() {
+            history.reset()
+            updatePlane(-2.0, 1.0, -1.0, 1.0)
+            repaint()
+        }
+
         with (mainPanel){
             background = Color.WHITE
             addComponentListener(object : ComponentAdapter() {
@@ -74,16 +101,12 @@ class MainWindow : JFrame(){
                     mfp.isVisible = false
                     mfp.selectionRect?.apply {
                         if (width > 3 && height > 3) {
+                            history.add(History.Coords(plane.xMin, plane.xMax, plane.yMin, plane.yMax))
                             val xMin = Converter.xScr2Crt(x, plane)
                             val xMax = Converter.xScr2Crt(x + width, plane)
                             val yMin = Converter.yScr2Crt(y + height, plane)
                             val yMax = Converter.yScr2Crt(y, plane)
-                            plane.let {
-                                it.xMin = xMin
-                                it.xMax = xMax
-                                it.yMin = yMin
-                                it.yMax = yMax
-                            }
+                            updatePlane(xMin, xMax, yMin, yMax)
                         }
                     }
                     repaint()
@@ -96,6 +119,16 @@ class MainWindow : JFrame(){
                     }
                 }
             })
+
+            ButtonBack.addActionListener {
+                onUndo()
+            }
+            ButtonBack.mnemonic = KeyEvent.VK_Z  // сначала нужно сделать пункт меню, а потом к нему добавить мнемонику: menuItem.mnemonic = KeyEvent.VK_Z
+            ButtonReset.addActionListener {
+                onReset()
+            }
+            ButtonReset.mnemonic = KeyEvent.VK_R  // сначала нужно сделать пункт меню, а потом к нему добавить мнемонику:  menuItem.mnemonic = KeyEvent.VK_R
+
             addPainter(fp)
         }
     }
