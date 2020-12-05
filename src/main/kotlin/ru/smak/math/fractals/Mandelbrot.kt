@@ -1,5 +1,6 @@
 package ru.smak.math.fractals
 
+import ru.smak.gui.graphics.convertation.CartesianScreenPlane
 import ru.smak.math.Complex
 import kotlin.math.*
 
@@ -17,11 +18,25 @@ class Mandelbrot {
      * Количество итераций, в течение которых проверяется
      * принадлежность точки множеству
      */
-    var maxIters = 200
-    set(value) {
-        //Проверяем устанавливаемое значение на корректность
-        field = max(200, abs(value))
+    var maxIters = 35
+        //30  8
+        // 35 10
+        set(value) {
+            //Проверяем устанавливаемое значение на корректность
+            field = max(maxIters, abs(value))
+        }
+
+    /**
+     * метод для динамического изменения  кол-во итераций который изменеться относительно площади окошка
+     */
+
+    fun changeMaxItrs(new: CartesianScreenPlane, old: CartesianScreenPlane): Int {
+        val areaOfNew=(Math.abs(new.xMax-new.xMin))*(Math.abs(new.yMax-new.yMin))
+        val areaOfOld = (Math.abs(old.xMax-old.xMin))*(Math.abs(old.yMax-old.yMin))
+        maxIters=(maxIters*areaOfOld/areaOfNew/10).toInt()
+        return maxIters
     }
+
 
     /**
      * Метод определения принадлежности точки множеству Мандельброта
