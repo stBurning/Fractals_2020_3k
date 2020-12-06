@@ -102,10 +102,13 @@ class MainWindow : JFrame(){
                     mfp.selectionRect?.apply {
                         if (width > 3 && height > 3) {
                             history.add(History.Coords(plane.xMin, plane.xMax, plane.yMin, plane.yMax))
+                            val old = CartesianScreenPlane(1,1,plane.xMin,plane.xMax,plane.yMin,plane.yMax)
                             val xMin = Converter.xScr2Crt(x, plane)
                             val xMax = Converter.xScr2Crt(x + width, plane)
                             val yMin = Converter.yScr2Crt(y + height, plane)
                             val yMax = Converter.yScr2Crt(y, plane)
+                            val new = CartesianScreenPlane(1,1,xMin,xMax,yMin,yMax)
+                            fractal.changeMaxItrs(new,old)//добавить фложак с менюшниками
                             updatePlane(xMin, xMax, yMin, yMax)
                         }
                     }
