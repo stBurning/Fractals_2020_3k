@@ -5,7 +5,7 @@
     <file type="web" url="file://$PROJECT_DIR$/ImagesToVideoConverter" />
     <file type="web" url="file://$PROJECT_DIR$/VideoRecorder" />
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_15" project-jdk-name="15" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_14" default="false" project-jdk-name="15" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/out" />
   </component>
 </project>
