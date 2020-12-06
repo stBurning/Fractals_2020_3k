@@ -1,5 +1,6 @@
 package ru.taerd.gui
 
+import ru.smak.gui.graphics.convertation.CartesianScreenPlane
 import ru.taerd.panels.ControlPanel
 import ru.taerd.panels.VideoPanel
 import java.awt.Dimension
@@ -12,6 +13,7 @@ class VideoWindow : JFrame() {
     private val minSizePrePanel = Dimension(100,300)
     private val videoPanel : VideoPanel
     private val prePanel : ControlPanel
+    private val frameList = mutableListOf<CartesianScreenPlane>()
     init{
         //сделать подписку на событие defaultCloseOperation которое будет блокировать потоки отрисовки изображения и закрыввтаь окошко
         defaultCloseOperation.apply{
@@ -41,5 +43,13 @@ class VideoWindow : JFrame() {
             )
         }
         pack()
+
+        prePanel.addButtonAddFrameListener {
+            frameList.add(videoPanel.plane)
+        }
+        prePanel.addGetFrameListener {
+            prePanel.createPlaneList(frameList)
+        }
     }
+
 }
