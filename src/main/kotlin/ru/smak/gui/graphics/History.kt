@@ -1,8 +1,9 @@
 package ru.smak.gui.graphics
 
-class History() {
-    class Coords(val xMin: Double, val xMax: Double, val yMin: Double, val yMax: Double)
-
+/**
+ * Класс журнала
+ */
+class History {
     private val list = mutableListOf<Coords>()
 
     fun add(element: Coords) {

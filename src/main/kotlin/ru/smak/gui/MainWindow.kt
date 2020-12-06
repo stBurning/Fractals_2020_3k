@@ -17,8 +17,8 @@ class MainWindow : JFrame(){
     private val history = History()
     private val minSize = Dimension(300, 200)
     private val mainPanel: GraphicsPanel
-    val ButtonBack = JButton("Назад")
-    val ButtonReset = JButton("Сбросить")
+    private val buttonBack = JButton("Назад")
+    private val buttonReset = JButton("Сбросить")
     init{
         defaultCloseOperation = EXIT_ON_CLOSE
         title = "Построение множества Мандельброта"
@@ -101,14 +101,14 @@ class MainWindow : JFrame(){
                     mfp.isVisible = false
                     mfp.selectionRect?.apply {
                         if (width > 3 && height > 3) {
-                            history.add(History.Coords(plane.xMin, plane.xMax, plane.yMin, plane.yMax))
-                            val old = CartesianScreenPlane(1,1,plane.xMin,plane.xMax,plane.yMin,plane.yMax)
+                            history.add(Coords(plane.xMin, plane.xMax, plane.yMin, plane.yMax))
+                            val old = Coords(plane.xMin,plane.xMax,plane.yMin,plane.yMax)
                             val xMin = Converter.xScr2Crt(x, plane)
                             val xMax = Converter.xScr2Crt(x + width, plane)
                             val yMin = Converter.yScr2Crt(y + height, plane)
                             val yMax = Converter.yScr2Crt(y, plane)
-                            val new = CartesianScreenPlane(1,1,xMin,xMax,yMin,yMax)
-                            fractal.changeMaxItrs(new,old)//добавить фложак с менюшниками
+                            val new = Coords(xMin,xMax,yMin,yMax)
+                            fractal.updateMaxIterations(new,old)  //добавить флажок с менюшниками
                             updatePlane(xMin, xMax, yMin, yMax)
                         }
                     }
@@ -123,14 +123,14 @@ class MainWindow : JFrame(){
                 }
             })
 
-            ButtonBack.addActionListener {
+            buttonBack.addActionListener {
                 onUndo()
             }
-            ButtonBack.mnemonic = KeyEvent.VK_Z  // сначала нужно сделать пункт меню, а потом к нему добавить мнемонику: menuItem.mnemonic = KeyEvent.VK_Z
-            ButtonReset.addActionListener {
+            buttonBack.mnemonic = KeyEvent.VK_Z  // сначала нужно сделать пункт меню, а потом к нему добавить мнемонику: menuItem.mnemonic = KeyEvent.VK_Z
+            buttonReset.addActionListener {
                 onReset()
             }
-            ButtonReset.mnemonic = KeyEvent.VK_R  // сначала нужно сделать пункт меню, а потом к нему добавить мнемонику:  menuItem.mnemonic = KeyEvent.VK_R
+            buttonReset.mnemonic = KeyEvent.VK_R  // сначала нужно сделать пункт меню, а потом к нему добавить мнемонику:  menuItem.mnemonic = KeyEvent.VK_R
 
             addPainter(fp)
         }

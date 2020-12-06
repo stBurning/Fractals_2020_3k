@@ -1,6 +1,6 @@
 package ru.smak.math.fractals
 
-import ru.smak.gui.graphics.convertation.CartesianScreenPlane
+import ru.smak.gui.graphics.Coords
 import ru.smak.math.Complex
 import kotlin.math.*
 
@@ -19,21 +19,22 @@ class Mandelbrot {
      * принадлежность точки множеству
      */
     var maxIters = 35
-        //30  8
-        // 35 10
-        set(value) {
+        private set(value) {
             //Проверяем устанавливаемое значение на корректность
             field = max(maxIters, abs(value))
         }
 
     /**
-     * метод для динамического изменения  кол-во итераций который изменеться относительно площади окошка
+     * Метод обновления максимального количества итераций
+     * @param new Новые значения границ плоскости
+     * @param old Старые значения границ плоскости
+     * @return обновленное количество итераций
      */
 
-    fun changeMaxItrs(new: CartesianScreenPlane, old: CartesianScreenPlane): Int {
-        val areaOfNew=(Math.abs(new.xMax-new.xMin))*(Math.abs(new.yMax-new.yMin))
-        val areaOfOld = (Math.abs(old.xMax-old.xMin))*(Math.abs(old.yMax-old.yMin))
-        maxIters=(maxIters*areaOfOld/areaOfNew/10).toInt()
+    fun updateMaxIterations(new: Coords, old: Coords): Int {
+        val newArea = abs(new.xMax-new.xMin) * abs(new.yMax-new.yMin)
+        val oldArea = abs(old.xMax-old.xMin) * abs(old.yMax-old.yMin)
+        maxIters = (maxIters * 0.1 * oldArea / newArea).toInt()
         return maxIters
     }
 
