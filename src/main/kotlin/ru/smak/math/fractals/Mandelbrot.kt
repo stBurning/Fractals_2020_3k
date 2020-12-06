@@ -30,7 +30,7 @@ class Mandelbrot {
      * false - в противном случае
      */
     fun isInSet(c: Complex): Float {
-        //var z = Complex()
+
         val z = Complex()
         for (i in 1..maxIters){
             z powAssign 2

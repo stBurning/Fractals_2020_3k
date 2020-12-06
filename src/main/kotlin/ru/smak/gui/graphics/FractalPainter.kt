@@ -21,14 +21,22 @@ class FractalPainter(
     private var bi = BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB)
     private var savedImage = BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB)
     private var partsDone = 0
-
     private val stripList: MutableList<FractalStripPainter> = mutableListOf()
+
     private val imageReadyListeners: MutableList<()->Unit> = mutableListOf()
     fun addImageReadyListener(l: ()->Unit){
         imageReadyListeners.add(l)
     }
     fun removeImageReadyListener(l: ()->Unit){
         imageReadyListeners.remove(l)
+    }
+
+    private val imageGetReadyListeners: MutableList<(BufferedImage)->Unit> = mutableListOf()
+    fun addImageGetReadyListener(l: (BufferedImage)->Unit){
+        imageGetReadyListeners.add(l)
+    }
+    fun removeImageGetReadyListener(l: (BufferedImage)->Unit){
+        imageGetReadyListeners.remove(l)
     }
 
     private var ms1 = 0L
@@ -95,13 +103,15 @@ class FractalPainter(
     private fun finished() {
         if (!stop) {
             savedImage = BufferedImage(plane.width, plane.height, BufferedImage.TYPE_INT_RGB)
+            println("Изображение готово")
+            imageGetReadyListeners.forEach{it.invoke(savedImage)}
+
             synchronized(stripList) {
                 savedImage.graphics.drawImage(bi, 0, 0, null)
             }
             recreate = false
         }
         ms2 = System.currentTimeMillis()
-        println((ms2 - ms1) / 1000.0)
         imageReadyListeners.forEach { it.invoke() }
     }
 
@@ -110,7 +120,6 @@ class FractalPainter(
      * @param g графический контекст для рисования
      */
     override fun paint(g: Graphics?) {
-        ms1 = System.currentTimeMillis()
         if (isInSet==null || g==null) return
         g.drawImage(
                 savedImage,
