@@ -137,8 +137,8 @@ class FractalPainter(
         stripList.clear()
         partsDone = 0
         bi = BufferedImage(
-                plane.width,
-                plane.height,
+                plane.realWidth,
+                plane.realHeight,
                 BufferedImage.TYPE_INT_RGB
         )
         stop = false
