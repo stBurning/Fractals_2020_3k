@@ -15,6 +15,9 @@ class MainWindow : JFrame(){
 
     private val minSize = Dimension(300, 200)
     private val mainPanel: GraphicsPanel
+    private val fp: FractalPainter
+
+
     init{
         defaultCloseOperation = EXIT_ON_CLOSE
         title = "Построение множества Мандельброта"
@@ -39,15 +42,18 @@ class MainWindow : JFrame(){
         pack()
 
         val plane = CartesianScreenPlane(
-            mainPanel.width, mainPanel.height,
-            -2.0, 1.0, -1.0, 1.0
+                mainPanel.width, mainPanel.height,
+                -2.0, 1.0, -1.0, 1.0
         )
-
+//
         val mfp = SelectionFramePainter(mainPanel.graphics)
-        val fractal = Mandelbrot()
-        val fp = FractalPainter(plane)
-        fp.isInSet = fractal::isInSet
-        fp.getColor = ::colorScheme5
+        fp = FractalPainter(plane)
+        createMandelbrot()
+//
+        //val menu = Menu(this)
+        //jMenuBar = menu.jMenuBar
+
+
         fp.addImageReadyListener { mainPanel.repaint() }
 
         with (mainPanel){
@@ -98,5 +104,50 @@ class MainWindow : JFrame(){
             })
             addPainter(fp)
         }
+
     }
+    fun changeColorScheme(i: Int){
+        if(i ==1){fp.getColor = ::colorScheme1 }
+        if(i==2){fp.getColor = ::colorScheme2 }
+        if(i==3){fp.getColor = ::colorScheme3 }
+        if(i==4){fp.getColor = ::colorScheme4 }
+        repaint()
+    }
+    fun createMandelbrot(){
+        title = "Построение множества Мандельброта"
+        val fractal = Mandelbrot()
+        fp.isInSet = fractal::isInSet
+        fp.getColor = ::colorScheme5
+    }
+    fun createJulia(){
+        title = "Построение множества Жюлия"
+        // тут для Жюлия так же как и в createMandelbrot()
+        //функции для fp!!!
+    }
+    //sd:SaveData
+    fun open(){
+        val plane1 = CartesianScreenPlane(
+                mainPanel.width, mainPanel.height,
+                -2.0, 1.0, -1.0, 1.0
+        )
+        fp.plane.let {
+            it.xMin = -2.0
+            it.xMax = 1.0
+            it.yMin = -1.0
+            it.yMax = 1.0
+        }
+
+        /*
+        в итоге будет так
+        fp.plane.let {
+            it.xMin = sd.xMin
+            it.xMax = sd.xMax
+            it.yMin = sd.yMin
+            it.yMax = sd.yMax
+        }*/
+        changeColorScheme(3)
+        createMandelbrot()
+    }
+
+
 }
