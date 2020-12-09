@@ -14,65 +14,66 @@ class ControlPanel: JPanel() {
     private var planeScroll = JScrollPane()
     private var arrayFrame : Array<CartesianScreenPlane>?=null
     private var planeList : JList<CartesianScreenPlane>?=null
-    set(value){
-        field=value
+
+    private val startButtonListeners : MutableList<() -> Unit> = mutableListOf()
+    fun addStartButtonListener(l: () -> Unit){
+        startButtonListeners.add(l)
     }
 
     private val addFrameButtonClickListener : MutableList<() -> Unit> = mutableListOf()
-    public fun addButtonAddFrameListener(l: () -> (Unit)){
+    fun addButtonAddFrameListener(l: () -> (Unit)){
         addFrameButtonClickListener.add(l)
     }
-    public fun removeButtonAddFrameListener(l: () -> (Unit)){
+    fun removeButtonAddFrameListener(l: () -> (Unit)){
         addFrameButtonClickListener.remove(l)
     }
 
     private val getFrameListener : MutableList<() -> Unit> = mutableListOf()
-    public fun addGetFrameListener(l: () -> (Unit)){
+    fun addGetFrameListener(l: () -> (Unit)){
         getFrameListener.add(l)
     }
-    public fun removeGetFrameListener(l: () -> (Unit)){
+    fun removeGetFrameListener(l: () -> (Unit)){
         getFrameListener.remove(l)
     }
 
     init{
         border= EtchedBorder()
         background = Color.WHITE
-        add(planeScroll)
-        //planeScroll не выводится на экран
         planeScroll.setLocation(5,5)
-        //planeScroll.isVisible=true
         add(addFrameButton)
         add(startButton)
-
+        add(planeScroll)
 
 
         with(addFrameButton) {
             //Событие возникающее при нажатии на добавление фрейма
             addMouseListener(object : MouseAdapter() {
                 override fun mouseClicked(e: MouseEvent?) {
-                    text="pressed"
                     super.mouseClicked(e)
                     addFrameButtonClickListener.forEach { l -> l() }
                     getFrameListener.forEach{l->l()}
+                    repaint()
                 }
             })
             with(startButton) {
                 //Событие возникающее при нажатии на создание видео
                 addMouseListener(object : MouseAdapter() {
                     override fun mouseClicked(e: MouseEvent?) {
-                        text="started"
                         super.mouseClicked(e)
+                        startButtonListeners.forEach{ l -> l()}
+
                     }
                 })
             }
         }
     }
-    public fun createPlaneList(frameList: List<CartesianScreenPlane>){
-        arrayFrame=Array<CartesianScreenPlane>(frameList.size) { it ->
+    fun createPlaneList(frameList: List<CartesianScreenPlane>){
+        arrayFrame=Array(frameList.size) {
             frameList[it]
         }
         planeList = JList(arrayFrame)
         planeScroll= JScrollPane(planeList)
+        planeScroll.isVisible = true
 
     }
 }

@@ -5,5 +5,5 @@ import ru.taerd.gui.VideoWindow
 
 fun main() {
     MainWindow().apply { isVisible = false }
-    VideoWindow().apply{ isVisible=true }
+    VideoWindow().apply { isVisible = true }
 }
