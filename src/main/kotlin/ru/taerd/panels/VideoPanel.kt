@@ -18,6 +18,8 @@ class VideoPanel : GraphicsPanel() {
     public var plane = CartesianScreenPlane(width, height, -2.0, 1.0, -1.0, 1.0)
         private set
 
+    //Создать свойство или еще что то для получения colorScheme
+
     //public var getColorScheme: ()->(Float)= colorScheme5()
     private val queue = LinkedBlockingQueue<BufferedImage>(100)
     private val videoProcessor = VideoProcessor(queue, 1600, 900)
@@ -25,8 +27,8 @@ class VideoPanel : GraphicsPanel() {
     init {
         this.border = EtchedBorder()
         plane = CartesianScreenPlane(
-            this.width, this.height,
-            -2.0, 1.0, -1.0, 1.0
+                this.width, this.height,
+                -2.0, 1.0, -1.0, 1.0
         )
         //thread {  videoProcessor.run()}
 
