@@ -1,7 +1,6 @@
 package ru.smak.gui.graphics
 
 import ru.smak.gui.graphics.convertation.CartesianScreenPlane
-import ru.smak.gui.graphics.convertation.Converter
 import java.awt.Color
 import java.awt.Font
 import java.awt.Graphics
@@ -14,8 +13,8 @@ import javax.swing.JFileChooser
 import javax.swing.JOptionPane
 import javax.swing.filechooser.FileNameExtensionFilter
 
-class SaveImage(val plane: CartesianScreenPlane, val img: BufferedImage, val detal: Boolean, val colorScheme: String) {
-    init {
+object SaveFractal {
+    operator fun invoke(plane: CartesianScreenPlane, img: BufferedImage, detal: Boolean, colorScheme: String) {
         val fileChooser = JFileChooser()
         with(fileChooser) {
             setDialogTitle("Сохранение файла...")
@@ -24,11 +23,7 @@ class SaveImage(val plane: CartesianScreenPlane, val img: BufferedImage, val det
             addChoosableFileFilter(filter1)
             addChoosableFileFilter(filter2)
         }
-        SaveImage(fileChooser)
-    }
-
-    fun SaveImage(fileChooser: JFileChooser) {
-        //Созддаем изображение в буфере изображения оперативной памяти
+//Созддаем изображение в буфере изображения оперативной памяти
         val bufferedImage = BufferedImage(img.getWidth(), img.getHeight() + (img.getHeight().toDouble() * 0.1).toInt(), BufferedImage.TYPE_INT_ARGB)
         val g: Graphics = bufferedImage.getGraphics()
         val xMin = BigDecimal(plane.xMin).setScale(2, RoundingMode.HALF_EVEN).toString()
