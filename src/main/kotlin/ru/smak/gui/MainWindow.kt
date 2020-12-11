@@ -123,6 +123,7 @@ class MainWindow : JFrame(){
                 }
             })
 
+            // SaveFractal.invoke(plane, fp.savedImage, true, "colorScheme1") //сначала нужно сделать пункт меню, потом перенести эту строку в обработчик нажатия на кнопку
             buttonBack.addActionListener {
                 onUndo()
             }
