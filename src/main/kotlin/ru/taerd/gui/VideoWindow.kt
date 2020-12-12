@@ -26,7 +26,7 @@ class VideoWindow : JFrame() {
 
 
     //components
-    private val videoPanel: VideoPanel
+    public val videoPanel: VideoPanel
     private val addFrameButton = JButton("Добавить")
     private val startButton = JButton("Создать")
     private val removeFrameButton = JButton("Удалить")
@@ -49,7 +49,7 @@ class VideoWindow : JFrame() {
             isVisible=false
         }
         title = "Составление видео из кадров"
-        minimumSize = Dimension(600, 500)
+        minimumSize = Dimension(950, 700)
         videoPanel = VideoPanel()
         layout = GroupLayout(contentPane).apply {
             setVerticalGroup(
@@ -235,8 +235,9 @@ class VideoWindow : JFrame() {
             addMouseListener(object : MouseAdapter() {
                 override fun mouseClicked(e: MouseEvent?) {
                     super.mouseClicked(e)
+
                     //timeBetweenFrames - время перехода между контрольными фреймами в int (секунд)
-                    //timeBetweenFrames = getValidValue(textField.text)
+                    timeBetweenFrames = getValidValue(textField.text)
 //                    val snapsList = mutableListOf<CartesianScreenPlane>()
 
                     //frameList.size -1 теряет последний элемент
@@ -277,13 +278,23 @@ class VideoWindow : JFrame() {
     /**
      * Функция проверки валидности строки на число
      * @param inputStr - строка, в которой записано число
-     * @return result - число в строке
-     * Не проверял работоспособность
+     * @return result - число от 1 до 30 
      */
     fun getValidValue(inputStr: String):Int{
-        println(inputStr)
-        val result = Integer.parseInt(inputStr)
-        println(result)
-        return result
+        //println(inputStr)
+        try{
+            val result = Integer.parseInt(inputStr)
+            //println(result)
+            if(result > 0 && result < 30) return result
+            else {
+                textField.text="value set 10"
+                return 10
+            }
+        }
+        catch (e :Exception){
+            println(e.message+ " -incorrect value")
+            textField.text=10.toString()
+            return 10
+        }
     }
 }
