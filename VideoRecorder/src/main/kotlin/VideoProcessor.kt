@@ -130,7 +130,3 @@ class VideoProcessor(
         createVideo("test.avi", "avi", 5, 30)
     }
 }
-
-
-
-
