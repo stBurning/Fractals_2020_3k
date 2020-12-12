@@ -1,12 +1,11 @@
 package ru.smak.gui
 
 import ru.smak.gui.components.GraphicsPanel
-import ru.smak.gui.graphics.FractalPainter
-import ru.smak.gui.graphics.SelectionFramePainter
-import ru.smak.gui.graphics.colorScheme5
+import ru.smak.gui.graphics.*
 import ru.smak.gui.graphics.convertation.CartesianScreenPlane
 import ru.smak.gui.graphics.convertation.Converter
 import ru.smak.math.fractals.Mandelbrot
+import ru.taerd.gui.VideoWindow
 import java.awt.Color
 import java.awt.Dimension
 import java.awt.event.*
@@ -14,10 +13,24 @@ import javax.swing.GroupLayout
 import javax.swing.JFrame
 
 
-class MainWindow : JFrame() {
+class MainWindow(Video: VideoWindow) : JFrame() {
 
     private val minSize = Dimension(300, 200)
     private val mainPanel: GraphicsPanel
+
+    /*
+    Экземпляр класса videoWindow
+    Как показать и убрать окно
+    video.isVisible=false/true
+    Указано как менять цветовую палитру и другие параметры
+    video.videoPanel.fp.getColor=::colorScheme5
+    video.videoPanel.fp.isInSet=fractal::isInSet
+    Также можно менять параметры у  plane
+    video.videoPanel.plane.xMin = value
+    Включать и выключать динамическую детализацию
+    video.videoPanel.fractal.maxIters = value
+    */
+    private val video = Video
 
     init {
         defaultCloseOperation = EXIT_ON_CLOSE
