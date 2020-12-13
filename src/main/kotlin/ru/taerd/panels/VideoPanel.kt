@@ -8,7 +8,6 @@ import ru.smak.gui.graphics.convertation.CartesianScreenPlane
 import ru.smak.math.fractals.Mandelbrot
 import java.awt.Dimension
 import java.awt.event.*
-import java.awt.image.BufferedImage
 import javax.swing.border.EtchedBorder
 
 class VideoPanel : GraphicsPanel() {
@@ -16,12 +15,6 @@ class VideoPanel : GraphicsPanel() {
     val plane = CartesianScreenPlane(width, height, -2.0, 1.0, -1.0, 1.0)
     val fp = FractalPainter(plane)
     private val fractal = Mandelbrot()
-
-    private val imageListeners: MutableList<(BufferedImage) -> Unit> = mutableListOf()
-    fun addImageListener(l: (BufferedImage) -> Unit){
-        imageListeners.add(l)
-    }
-
 
     init {
         this.border = EtchedBorder()
@@ -33,7 +26,6 @@ class VideoPanel : GraphicsPanel() {
         fp.getColor = ::colorScheme5
 
         fp.addImageReadyListener { this.repaint() }
-        fp.addGetImageListener { img -> imageListeners.forEach { l -> l(img) } }
 
         with(this) {
             background = java.awt.Color.WHITE

@@ -15,7 +15,8 @@ class VideoProcessor(
     private val queue: LinkedBlockingQueue<BufferedImage>,
     private val width: Int,
     private val height: Int,
-    private val duration: Int
+    private val duration: Int,
+    private val fps: Int
 ) : Runnable {
     /**
      * Функция создания видео в потоке
@@ -44,8 +45,8 @@ class VideoProcessor(
         val encoder = Encoder.make(codec)
         /**Устанавливаем параметры энкодера*/
         // width, height - ширина и высота входных изображений и видео на выходе*/
-        encoder.width = 1600
-        encoder.height = 900
+        encoder.width = width
+        encoder.height = height
         //PixelFormat -
         val pixelFormat = PixelFormat.Type.PIX_FMT_YUV420P
         encoder.pixelFormat = pixelFormat
@@ -128,6 +129,6 @@ class VideoProcessor(
     }
 
     override fun run() {
-        createVideo("test1.avi", "avi", duration, 30)
+        createVideo("test1.avi", "avi", duration, fps)
     }
 }

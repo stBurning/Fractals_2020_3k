@@ -18,7 +18,7 @@ class FractalPainter(
     var getColor: ((Float) -> Color) = { x -> Color(x, x, x) }
     private var recreate = true
     private var stop = false
-    private var bi = BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB)
+    var bi = BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB)
     private var savedImage = BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB)
     private var partsDone = 0
     private val stripList: MutableList<FractalStripPainter> = mutableListOf()
@@ -139,8 +139,14 @@ class FractalPainter(
             })
         }
     }
+    fun getImage():BufferedImage{
+        stripList.forEach { it.thread?.join() }
+        return savedImage
+    }
+
 
 }
+
 
 private infix fun Float.eq(other: Float) =
     abs(this - other) < max(Math.ulp(this), Math.ulp(other)) * 2

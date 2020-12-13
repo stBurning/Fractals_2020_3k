@@ -1,6 +1,7 @@
 package ru.taerd.gui
 
 import VideoProcessor
+import ru.smak.gui.graphics.FractalPainter
 import ru.smak.gui.graphics.convertation.CartesianScreenPlane
 import ru.taerd.panels.VideoPanel
 import java.awt.Dimension
@@ -31,6 +32,10 @@ class VideoWindow : JFrame() {
     //Creating Video
     private val queue = LinkedBlockingQueue<BufferedImage>(100)
     private var videoProcessor: VideoProcessor? = null
+    private var t = thread { videoProcessor }
+    private val fps = 60
+    private val WIDTH = 1920
+    private val HEIGHT = 1080
 
     //components
     val videoPanel: VideoPanel
@@ -51,7 +56,7 @@ class VideoWindow : JFrame() {
     private val frameList = mutableListOf<CartesianScreenPlane>()
 
     init {
-        //сделать подписку на событие defaultCloseOperation которое будет блокировать потоки отрисовки изображения и закрывать окошко
+
         defaultCloseOperation.apply {
             isVisible = false
         }
@@ -204,9 +209,6 @@ class VideoWindow : JFrame() {
             )
         }
         pack()
-
-
-
         with(addFrameButton) {
             //Событие возникающее при нажатии кнопку добавления фрейма
             addMouseListener(object : MouseAdapter() {
@@ -243,40 +245,34 @@ class VideoWindow : JFrame() {
                 override fun mouseClicked(e: MouseEvent?) {
                     super.mouseClicked(e)
 
-                    //timeBetweenFrames - время перехода между контрольными фреймами в int (секунд)
                     timeBetweenFrames = getValidValue(textField.text)
-                    videoProcessor = VideoProcessor(queue, 1600, 900, timeBetweenFrames * (frameList.size - 1))
-                    videoPanel.fp.addGetImageListener { img ->
-                        queue.add(img)
-                        println("Image Added into the Queue")
-                    }
+                    val snapsCount = timeBetweenFrames * fps
+                    videoProcessor = VideoProcessor(queue, WIDTH, HEIGHT, timeBetweenFrames * (frameList.size - 1), fps)
                     thread { videoProcessor!!.run() }
+                    videoPanel.plane.apply {
+                        realHeight = HEIGHT
+                        realWidth = WIDTH
+                    }
+
                     for (i in 0 until frameList.size - 1) {
 
-//                        val accel = max(
-//                            (frameList[i].xMax - frameList[i].xMin) / (frameList[i + 1].xMax - frameList[i + 1].xMin),
-//                            (frameList[i].yMax - frameList[i].yMin) / (frameList[i + 1].yMax - frameList[i + 1].yMin)
-//                        )
+                        val xMinDt = abs(frameList[i].xMin - frameList[i + 1].xMin) / snapsCount
+                        val xMaxDt = abs(frameList[i].xMax - frameList[i + 1].xMax) / snapsCount
+                        val yMinDt = abs(frameList[i].yMin - frameList[i + 1].yMin) / snapsCount
+                        val yMaxDt = abs(frameList[i].yMax - frameList[i + 1].yMax) / snapsCount
 
-                        val snapsPerRound = timeBetweenFrames * 30
-                        println("SnapsCount: $snapsPerRound")
-                        val xMinDt = abs(frameList[i].xMin - frameList[i + 1].xMin) / snapsPerRound
-                        val xMaxDt = abs(frameList[i].xMax - frameList[i + 1].xMax) / snapsPerRound
-                        val yMinDt = abs(frameList[i].yMin - frameList[i + 1].yMin) / snapsPerRound
-                        val yMaxDt = abs(frameList[i].yMax - frameList[i + 1].yMax) / snapsPerRound
 
-                        for (j in 0..snapsPerRound) {
-                            /**Вот тут проблемка
-                             * Цикл быстрее пробегает чем панелька отрисовыввается
-                             * из=за этого на выходе вместо 300 картинок получается 60-80*/
+                        for (j in 0..snapsCount) {
                             videoPanel.plane.apply {
                                 xMin = frameList[i].xMin + xMinDt * j
                                 xMax = frameList[i].xMax - xMaxDt * j
                                 yMin = frameList[i].yMin + yMinDt * j
                                 yMax = frameList[i].yMax - yMaxDt * j
                             }
+
+
                             videoPanel.paint(videoPanel.graphics)
-                            println(j)
+                            queue.put(videoPanel.fp.getImage())
                         }
                     }
                     println("Image Generating finished!")

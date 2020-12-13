@@ -21,5 +21,4 @@ open class GraphicsPanel : JPanel(){
         if (painters.contains(p))
             painters.remove(p)
     }
-
 }
