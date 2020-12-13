@@ -131,7 +131,7 @@ class FractalPainter(
         stripList.forEach { it.thread?.join() }
         stripList.clear()
         partsDone = 0
-        bi = BufferedImage(plane.width, plane.height, BufferedImage.TYPE_INT_RGB)
+        bi = BufferedImage(plane.realWidth, plane.realHeight, BufferedImage.TYPE_INT_RGB)
         stop = false
         for (i in 0 until stripCount) {
             stripList.add(FractalStripPainter(i).also {

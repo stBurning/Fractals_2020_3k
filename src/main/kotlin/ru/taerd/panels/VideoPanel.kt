@@ -11,32 +11,29 @@ import java.awt.event.*
 import java.awt.image.BufferedImage
 import java.util.concurrent.LinkedBlockingQueue
 import javax.swing.border.EtchedBorder
-import kotlin.concurrent.thread
 
 class VideoPanel : GraphicsPanel() {
 
-    public var plane = CartesianScreenPlane(width, height, -2.0, 1.0, -1.0, 1.0)
-        private set
+    public val plane = CartesianScreenPlane(width, height, -2.0, 1.0, -1.0, 1.0)
+    public val fp = FractalPainter(plane)
+    public val fractal = Mandelbrot()
 
-    //public var getColorScheme: ()->(Float)= colorScheme5()
     private val queue = LinkedBlockingQueue<BufferedImage>(100)
     private val videoProcessor = VideoProcessor(queue, 1600, 900)
 
     init {
         this.border = EtchedBorder()
-        plane = CartesianScreenPlane(
-            this.width, this.height,
-            -2.0, 1.0, -1.0, 1.0
-        )
+
         //thread {  videoProcessor.run()}
 
         val mfp = SelectionFramePainter(this.graphics)
-        val fractal = Mandelbrot()
-        val fp = FractalPainter(plane)
+
+        //val fractal = Mandelbrot()
+        //val fp = FractalPainter(plane)
 
         fp.isInSet = fractal::isInSet
 
-        fp.getColor = ::colorScheme5//getColorScheme()
+        fp.getColor= ::colorScheme5
 
         fp.addImageReadyListener { this.repaint() }
 
