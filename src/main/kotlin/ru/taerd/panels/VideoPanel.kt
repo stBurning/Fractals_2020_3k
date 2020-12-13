@@ -1,42 +1,39 @@
 package ru.taerd.panels
 
-import VideoProcessor
 import ru.smak.gui.components.GraphicsPanel
 import ru.smak.gui.graphics.FractalPainter
 import ru.smak.gui.graphics.SelectionFramePainter
 import ru.smak.gui.graphics.colorScheme5
 import ru.smak.gui.graphics.convertation.CartesianScreenPlane
 import ru.smak.math.fractals.Mandelbrot
+import java.awt.Dimension
 import java.awt.event.*
 import java.awt.image.BufferedImage
-import java.util.concurrent.LinkedBlockingQueue
 import javax.swing.border.EtchedBorder
 
 class VideoPanel : GraphicsPanel() {
 
-    public val plane = CartesianScreenPlane(width, height, -2.0, 1.0, -1.0, 1.0)
-    public val fp = FractalPainter(plane)
-    public val fractal = Mandelbrot()
+    val plane = CartesianScreenPlane(width, height, -2.0, 1.0, -1.0, 1.0)
+    val fp = FractalPainter(plane)
+    private val fractal = Mandelbrot()
 
-    private val queue = LinkedBlockingQueue<BufferedImage>(100)
-    private val videoProcessor = VideoProcessor(queue, 1600, 900)
+    private val imageListeners: MutableList<(BufferedImage) -> Unit> = mutableListOf()
+    fun addImageListener(l: (BufferedImage) -> Unit){
+        imageListeners.add(l)
+    }
+
 
     init {
         this.border = EtchedBorder()
-
-        //thread {  videoProcessor.run()}
-
+        minimumSize = Dimension(1600, 900)
         val mfp = SelectionFramePainter(this.graphics)
-
-        //val fractal = Mandelbrot()
-        //val fp = FractalPainter(plane)
 
         fp.isInSet = fractal::isInSet
 
-        fp.getColor= ::colorScheme5
+        fp.getColor = ::colorScheme5
 
         fp.addImageReadyListener { this.repaint() }
-
+        fp.addGetImageListener { img -> imageListeners.forEach { l -> l(img) } }
 
         with(this) {
             background = java.awt.Color.WHITE

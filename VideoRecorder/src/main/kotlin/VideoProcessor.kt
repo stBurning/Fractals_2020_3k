@@ -14,7 +14,8 @@ import java.util.concurrent.LinkedBlockingQueue
 class VideoProcessor(
     private val queue: LinkedBlockingQueue<BufferedImage>,
     private val width: Int,
-    private val height: Int
+    private val height: Int,
+    private val duration: Int
 ) : Runnable {
     /**
      * Функция создания видео в потоке
@@ -79,7 +80,7 @@ class VideoProcessor(
         while (i < duration / framerate.double) {
             //Получаем изображение из очереди если оно доступно, иначе ждем
             val img = queue.take()
-            val newImg = BufferedImage(1600, 900, BufferedImage.TYPE_INT_RGB)
+            val newImg = BufferedImage(width, height, BufferedImage.TYPE_INT_RGB)
             newImg.graphics.drawImage(img, 0, 0, null)
             val image = convertToType(newImg, BufferedImage.TYPE_3BYTE_BGR)
             println("[Encoder] Изображение $i добавлено")
@@ -127,6 +128,6 @@ class VideoProcessor(
     }
 
     override fun run() {
-        createVideo("test.avi", "avi", 5, 30)
+        createVideo("test1.avi", "avi", duration, 30)
     }
 }

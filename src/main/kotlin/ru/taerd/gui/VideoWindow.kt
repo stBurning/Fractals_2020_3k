@@ -1,12 +1,16 @@
 package ru.taerd.gui
 
+import VideoProcessor
 import ru.smak.gui.graphics.convertation.CartesianScreenPlane
 import ru.taerd.panels.VideoPanel
 import java.awt.Dimension
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
+import java.awt.image.BufferedImage
+import java.util.concurrent.LinkedBlockingQueue
 import javax.swing.*
-import kotlin.math.max
+import kotlin.concurrent.thread
+import kotlin.math.abs
 
 /**
  * Класс дополнительного окна,для создания видео по фреймам
@@ -21,12 +25,15 @@ class VideoWindow : JFrame() {
     private val minSizeStartJButton = Dimension(150, 20)
     private val minSizeStopJButton = Dimension(150, 20)
 
-    private val minSizeTextField = Dimension(80,20)
-    private val minSizeTextLabel = Dimension(220,20)
+    private val minSizeTextField = Dimension(80, 20)
+    private val minSizeTextLabel = Dimension(220, 20)
 
+    //Creating Video
+    private val queue = LinkedBlockingQueue<BufferedImage>(100)
+    private var videoProcessor: VideoProcessor? = null
 
     //components
-    public val videoPanel: VideoPanel
+    val videoPanel: VideoPanel
     private val addFrameButton = JButton("Добавить")
     private val startButton = JButton("Создать")
     private val removeFrameButton = JButton("Удалить")
@@ -45,155 +52,155 @@ class VideoWindow : JFrame() {
 
     init {
         //сделать подписку на событие defaultCloseOperation которое будет блокировать потоки отрисовки изображения и закрывать окошко
-        defaultCloseOperation.apply{
-            isVisible=false
+        defaultCloseOperation.apply {
+            isVisible = false
         }
         title = "Составление видео из кадров"
         minimumSize = Dimension(950, 700)
         videoPanel = VideoPanel()
         layout = GroupLayout(contentPane).apply {
             setVerticalGroup(
-                    createSequentialGroup()
-                            .addGap(4)
-                            .addGroup(
-                                    createParallelGroup()
-                                            .addComponent(
-                                                    videoPanel,
-                                                    minSizeVidePanel.height,
-                                                    minSizeVidePanel.height,
-                                                    GroupLayout.DEFAULT_SIZE
-                                            )
-                                            .addGap(4)
-                                            .addGroup(
-                                                    createSequentialGroup()
-                                                            .addComponent(
-                                                                    planeScroll,
-                                                                    minSizePlaneScroll.height,
-                                                                    minSizePlaneScroll.height,
-                                                                    GroupLayout.DEFAULT_SIZE
-                                                            )
-                                                            .addGap(4)
-                                                            .addGroup(
-                                                                    createParallelGroup()
-                                                                            .addComponent(
-                                                                                    addFrameButton,
-                                                                                    minSizeAddFrameJButton.height,
-                                                                                    minSizeAddFrameJButton.height,
-                                                                                    GroupLayout.DEFAULT_SIZE
-                                                                            )
-                                                                            .addGap(4)
-                                                                            .addComponent(
-                                                                                    removeFrameButton,
-                                                                                    minSizeRemoveFrameJButton.height,
-                                                                                    minSizeRemoveFrameJButton.height,
-                                                                                    GroupLayout.DEFAULT_SIZE
-                                                                            )
-                                                            )
-                                                            .addGap(4)
-                                                            .addGroup(
-                                                                    createParallelGroup()
-                                                                            .addComponent(
-                                                                                    textLabel,
-                                                                                    minSizeTextLabel.height,
-                                                                                    minSizeTextLabel.height,
-                                                                                    GroupLayout.DEFAULT_SIZE
-                                                                            )
-                                                                            .addGap(4)
-                                                                            .addComponent(
-                                                                                    textField,
-                                                                                    minSizeTextField.height,
-                                                                                    minSizeTextField.height,
-                                                                                    GroupLayout.PREFERRED_SIZE
-                                                                            )
-                                                            )
-                                                            .addGap(4)
-                                                            .addGroup(
-                                                                    createParallelGroup()
-                                                                            .addComponent(
-                                                                                    startButton,
-                                                                                    minSizeStartJButton.height,
-                                                                                    minSizeStartJButton.height,
-                                                                                    GroupLayout.DEFAULT_SIZE
-                                                                            )
-                                                                            .addGap(4)
-                                                                            .addComponent(
-                                                                                    stopButton,
-                                                                                    minSizeStopJButton.height,
-                                                                                    minSizeStopJButton.height,
-                                                                                    GroupLayout.DEFAULT_SIZE
-                                                                            )
-                                                            )
-                                            )
-
+                createSequentialGroup()
+                    .addGap(4)
+                    .addGroup(
+                        createParallelGroup()
+                            .addComponent(
+                                videoPanel,
+                                minSizeVidePanel.height,
+                                minSizeVidePanel.height,
+                                GroupLayout.DEFAULT_SIZE
                             )
                             .addGap(4)
+                            .addGroup(
+                                createSequentialGroup()
+                                    .addComponent(
+                                        planeScroll,
+                                        minSizePlaneScroll.height,
+                                        minSizePlaneScroll.height,
+                                        GroupLayout.DEFAULT_SIZE
+                                    )
+                                    .addGap(4)
+                                    .addGroup(
+                                        createParallelGroup()
+                                            .addComponent(
+                                                addFrameButton,
+                                                minSizeAddFrameJButton.height,
+                                                minSizeAddFrameJButton.height,
+                                                GroupLayout.DEFAULT_SIZE
+                                            )
+                                            .addGap(4)
+                                            .addComponent(
+                                                removeFrameButton,
+                                                minSizeRemoveFrameJButton.height,
+                                                minSizeRemoveFrameJButton.height,
+                                                GroupLayout.DEFAULT_SIZE
+                                            )
+                                    )
+                                    .addGap(4)
+                                    .addGroup(
+                                        createParallelGroup()
+                                            .addComponent(
+                                                textLabel,
+                                                minSizeTextLabel.height,
+                                                minSizeTextLabel.height,
+                                                GroupLayout.DEFAULT_SIZE
+                                            )
+                                            .addGap(4)
+                                            .addComponent(
+                                                textField,
+                                                minSizeTextField.height,
+                                                minSizeTextField.height,
+                                                GroupLayout.PREFERRED_SIZE
+                                            )
+                                    )
+                                    .addGap(4)
+                                    .addGroup(
+                                        createParallelGroup()
+                                            .addComponent(
+                                                startButton,
+                                                minSizeStartJButton.height,
+                                                minSizeStartJButton.height,
+                                                GroupLayout.DEFAULT_SIZE
+                                            )
+                                            .addGap(4)
+                                            .addComponent(
+                                                stopButton,
+                                                minSizeStopJButton.height,
+                                                minSizeStopJButton.height,
+                                                GroupLayout.DEFAULT_SIZE
+                                            )
+                                    )
+                            )
+
+                    )
+                    .addGap(4)
             )
             setHorizontalGroup(
-                    createSequentialGroup()
-                            .addGap(4)
-                            .addComponent(videoPanel, minSizeVidePanel.width, minSizeVidePanel.width, GroupLayout.DEFAULT_SIZE)
-                            .addGap(4)
-                            .addGroup(
-                                    createParallelGroup()
-                                            .addComponent(
-                                                    planeScroll,
-                                                    minSizePlaneScroll.width,
-                                                    minSizePlaneScroll.width,
-                                                    GroupLayout.DEFAULT_SIZE
-                                            )
-                                            .addGap(4)
-                                            .addGroup(
-                                                    createSequentialGroup()
-                                                            .addComponent(
-                                                                    addFrameButton,
-                                                                    minSizeAddFrameJButton.width,
-                                                                    minSizeAddFrameJButton.width,
-                                                                    GroupLayout.DEFAULT_SIZE
-                                                            )
-                                                            .addGap(4)
-                                                            .addComponent(
-                                                                    removeFrameButton,
-                                                                    minSizeRemoveFrameJButton.width,
-                                                                    minSizeRemoveFrameJButton.width,
-                                                                    GroupLayout.DEFAULT_SIZE
-                                                            )
-                                            )
-                                            .addGap(4)
-                                            .addGroup(
-                                                    createSequentialGroup()
-                                                            .addComponent(
-                                                                    textLabel,
-                                                                    minSizeTextLabel.width,
-                                                                    minSizeTextLabel.width,
-                                                                    GroupLayout.DEFAULT_SIZE
-                                                            )
-                                                            .addGap(4)
-                                                            .addComponent(
-                                                                    textField,
-                                                                    minSizeTextField.width,
-                                                                    minSizeTextField.width,
-                                                                    GroupLayout.PREFERRED_SIZE
-                                                            )
-                                            )
-                                            .addGap(4)
-                                            .addGroup(
-                                                    createSequentialGroup()
-                                                            .addComponent(
-                                                                    startButton,
-                                                                    minSizeStartJButton.width,
-                                                                    minSizeStartJButton.width,
-                                                                    GroupLayout.DEFAULT_SIZE
-                                                            )
-                                                            .addGap(4)
-                                                            .addComponent(
-                                                                    stopButton,
-                                                                    minSizeStopJButton.width,
-                                                                    minSizeStopJButton.width,
-                                                                    GroupLayout.DEFAULT_SIZE
-                                                            )
-                                            )
+                createSequentialGroup()
+                    .addGap(4)
+                    .addComponent(videoPanel, minSizeVidePanel.width, minSizeVidePanel.width, GroupLayout.DEFAULT_SIZE)
+                    .addGap(4)
+                    .addGroup(
+                        createParallelGroup()
+                            .addComponent(
+                                planeScroll,
+                                minSizePlaneScroll.width,
+                                minSizePlaneScroll.width,
+                                GroupLayout.DEFAULT_SIZE
                             )
                             .addGap(4)
+                            .addGroup(
+                                createSequentialGroup()
+                                    .addComponent(
+                                        addFrameButton,
+                                        minSizeAddFrameJButton.width,
+                                        minSizeAddFrameJButton.width,
+                                        GroupLayout.DEFAULT_SIZE
+                                    )
+                                    .addGap(4)
+                                    .addComponent(
+                                        removeFrameButton,
+                                        minSizeRemoveFrameJButton.width,
+                                        minSizeRemoveFrameJButton.width,
+                                        GroupLayout.DEFAULT_SIZE
+                                    )
+                            )
+                            .addGap(4)
+                            .addGroup(
+                                createSequentialGroup()
+                                    .addComponent(
+                                        textLabel,
+                                        minSizeTextLabel.width,
+                                        minSizeTextLabel.width,
+                                        GroupLayout.DEFAULT_SIZE
+                                    )
+                                    .addGap(4)
+                                    .addComponent(
+                                        textField,
+                                        minSizeTextField.width,
+                                        minSizeTextField.width,
+                                        GroupLayout.PREFERRED_SIZE
+                                    )
+                            )
+                            .addGap(4)
+                            .addGroup(
+                                createSequentialGroup()
+                                    .addComponent(
+                                        startButton,
+                                        minSizeStartJButton.width,
+                                        minSizeStartJButton.width,
+                                        GroupLayout.DEFAULT_SIZE
+                                    )
+                                    .addGap(4)
+                                    .addComponent(
+                                        stopButton,
+                                        minSizeStopJButton.width,
+                                        minSizeStopJButton.width,
+                                        GroupLayout.DEFAULT_SIZE
+                                    )
+                            )
+                    )
+                    .addGap(4)
             )
         }
         pack()
@@ -207,7 +214,7 @@ class VideoWindow : JFrame() {
                     super.mouseClicked(e)
                     frameList.add(videoPanel.plane.copy())
                     val arrPlane = videoPanel.plane.copy()
-                    dlm.addElement("xMin: "+arrPlane.xMin.toString()+" xMax: "+arrPlane.xMax.toString()+" yMin: "+arrPlane.yMin.toString()+" yMax: "+arrPlane.yMax.toString())
+                    dlm.addElement("xMin: " + arrPlane.xMin.toString() + " xMax: " + arrPlane.xMax.toString() + " yMin: " + arrPlane.yMin.toString() + " yMax: " + arrPlane.yMax.toString())
                     val index: Int = dlm.size() - 1
                     list.selectedIndex = index
                     list.ensureIndexIsVisible(index)
@@ -222,7 +229,7 @@ class VideoWindow : JFrame() {
                 override fun mouseClicked(e: MouseEvent?) {
                     super.mouseClicked(e)
                     val indexRemove = list.selectedIndex
-                    if(indexRemove>=0){
+                    if (indexRemove >= 0) {
                         dlm.remove(indexRemove)
                         frameList.removeAt(indexRemove)
                         //list.remove(indexRemove)
@@ -238,36 +245,48 @@ class VideoWindow : JFrame() {
 
                     //timeBetweenFrames - время перехода между контрольными фреймами в int (секунд)
                     timeBetweenFrames = getValidValue(textField.text)
-//                    val snapsList = mutableListOf<CartesianScreenPlane>()
-
-                    //frameList.size -1 теряет последний элемент
-                    for (i in 0 until frameList.size - 1) {
-                        println(frameList[i])
-
-//                        val xMinDt = frameList[i].xMin - frameList[i + 1].xMin
-//                        val xMaxDt = frameList[i].xMax - frameList[i + 1].xMax
-//                        val yMinDt = frameList[i].yMin - frameList[i + 1].yMin
-//                        val yMaxDt = frameList[i].yMax - frameList[i + 1].yMax
-
-                        val accel = max(
-                                (frameList[i].xMax - frameList[i].xMin) / (frameList[i + 1].xMax - frameList[i + 1].xMin),
-                                (frameList[i].yMax - frameList[i].yMin) / (frameList[i + 1].yMax - frameList[i + 1].yMin)
-                        )
-
-//                        val snapsPerRound = (10 * accel).roundToInt()
-
-//                        for (j in 0..snapsPerRound) {
-//
-//                        }
-
+                    videoProcessor = VideoProcessor(queue, 1600, 900, timeBetweenFrames * (frameList.size - 1))
+                    videoPanel.fp.addGetImageListener { img ->
+                        queue.add(img)
+                        println("Image Added into the Queue")
                     }
+                    thread { videoProcessor!!.run() }
+                    for (i in 0 until frameList.size - 1) {
+
+//                        val accel = max(
+//                            (frameList[i].xMax - frameList[i].xMin) / (frameList[i + 1].xMax - frameList[i + 1].xMin),
+//                            (frameList[i].yMax - frameList[i].yMin) / (frameList[i + 1].yMax - frameList[i + 1].yMin)
+//                        )
+
+                        val snapsPerRound = timeBetweenFrames * 30
+                        println("SnapsCount: $snapsPerRound")
+                        val xMinDt = abs(frameList[i].xMin - frameList[i + 1].xMin) / snapsPerRound
+                        val xMaxDt = abs(frameList[i].xMax - frameList[i + 1].xMax) / snapsPerRound
+                        val yMinDt = abs(frameList[i].yMin - frameList[i + 1].yMin) / snapsPerRound
+                        val yMaxDt = abs(frameList[i].yMax - frameList[i + 1].yMax) / snapsPerRound
+
+                        for (j in 0..snapsPerRound) {
+                            /**Вот тут проблемка
+                             * Цикл быстрее пробегает чем панелька отрисовыввается
+                             * из=за этого на выходе вместо 300 картинок получается 60-80*/
+                            videoPanel.plane.apply {
+                                xMin = frameList[i].xMin + xMinDt * j
+                                xMax = frameList[i].xMax - xMaxDt * j
+                                yMin = frameList[i].yMin + yMinDt * j
+                                yMax = frameList[i].yMax - yMaxDt * j
+                            }
+                            videoPanel.paint(videoPanel.graphics)
+                            println(j)
+                        }
+                    }
+                    println("Image Generating finished!")
                 }
             })
         }
-        with (stopButton){
+        with(stopButton) {
             //Событие возникающее при нажатии на кнопку Остановить
-            addMouseListener(object : MouseAdapter(){
-                override fun mouseClicked(e:MouseEvent?){
+            addMouseListener(object : MouseAdapter() {
+                override fun mouseClicked(e: MouseEvent?) {
                     super.mouseClicked(e)
                     //Блокировка и удаление потоков отрисовки фреймов
                 }
@@ -278,23 +297,22 @@ class VideoWindow : JFrame() {
     /**
      * Функция проверки валидности строки на число
      * @param inputStr - строка, в которой записано число
-     * @return result - число от 1 до 30 
+     * @return result - число от 1 до 30
      */
-    fun getValidValue(inputStr: String):Int{
+    fun getValidValue(inputStr: String): Int {
         //println(inputStr)
-        try{
+        return try {
             val result = Integer.parseInt(inputStr)
             //println(result)
-            if(result > 0 && result < 30) return result
+            if (result in 1..29) result
             else {
-                textField.text="value set 10"
-                return 10
+                textField.text = "value set 10"
+                10
             }
-        }
-        catch (e :Exception){
-            println(e.message+ " -incorrect value")
-            textField.text=10.toString()
-            return 10
+        } catch (e: Exception) {
+            println(e.message + " -incorrect value")
+            textField.text = 10.toString()
+            10
         }
     }
 }
