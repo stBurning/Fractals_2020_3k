@@ -17,12 +17,12 @@ class MainWindow : JFrame(){
     private val history = History()
     private val minSize = Dimension(300, 200)
     private val mainPanel: GraphicsPanel
-    private val fp: FractalPainter
-
-
-    private val buttonBack = JButton("Назад")
-    private val buttonReset = JButton("Сбросить")
+    internal val fp: FractalPainter
+    internal val plane:  CartesianScreenPlane
+    internal var updated:Boolean=false
+    val fractal = Mandelbrot()
     init{
+
         defaultCloseOperation = EXIT_ON_CLOSE
         title = "Построение множества Мандельброта"
         minimumSize = Dimension(700, 700)
@@ -45,47 +45,30 @@ class MainWindow : JFrame(){
 
         pack()
 
-        val plane = CartesianScreenPlane(
+        plane = CartesianScreenPlane(
             mainPanel.width, mainPanel.height,
             -2.0, 1.0, -1.0, 1.0
         )
 
         val mfp = SelectionFramePainter(mainPanel.graphics)
-        fp = FractalPainter(plane)
-        createMandelbrot()
-//
-        //val menu = Menu(this)
-        //jMenuBar = menu.jMenuBar
+
+        //createMandelbrot()
+       // fractal = Mandelbrot()
+
+
 
         val fractal = Mandelbrot()
-        val fp = FractalPainter(plane)
-        fp.isInSet = fractal::isInSet
-        fp.getColor = ::colorScheme5
+        fp = FractalPainter(plane)
+
+        val menu = Menu(this)
+        jMenuBar = menu.jMenuBar
+
+
+
+
+
 
         fp.addImageReadyListener { mainPanel.repaint() }
-
-        fun updatePlane(xMin: Double, xMax: Double, yMin: Double, yMax: Double) {
-            plane.also {
-                it.xMin = xMin
-                it.xMax = xMax
-                it.yMin = yMin
-                it.yMax = yMax
-            }
-        }
-
-        fun onUndo() {
-            val coords = history.undo()
-            if (coords != null) {
-                updatePlane(coords.xMin, coords.xMax, coords.yMin, coords.yMax)
-                repaint()
-            }
-        }
-
-        fun onReset() {
-            history.reset()
-            updatePlane(-2.0, 1.0, -1.0, 1.0)
-            repaint()
-        }
 
         with (mainPanel){
             background = Color.WHITE
@@ -118,7 +101,9 @@ class MainWindow : JFrame(){
                             val yMin = Converter.yScr2Crt(y + height, plane)
                             val yMax = Converter.yScr2Crt(y, plane)
                             val new = Coords(xMin,xMax,yMin,yMax)
-                            fractal.updateMaxIterations(new,old)  //добавить флажок с менюшниками
+                            if(updated) {
+                                fractal.updateMaxIterations(new, old)  //добавить флажок с менюшниками
+                            }
                             updatePlane(xMin, xMax, yMin, yMax)
                         }
                     }
@@ -133,20 +118,36 @@ class MainWindow : JFrame(){
                 }
             })
 
-            // SaveFractal.invoke(plane, fp.savedImage, true, "colorScheme1") //сначала нужно сделать пункт меню, потом перенести эту строку в обработчик нажатия на кнопку
-            buttonBack.addActionListener {
-                onUndo()
-            }
-            buttonBack.mnemonic = KeyEvent.VK_Z  // сначала нужно сделать пункт меню, а потом к нему добавить мнемонику: menuItem.mnemonic = KeyEvent.VK_Z
-            buttonReset.addActionListener {
-                onReset()
-            }
-            buttonReset.mnemonic = KeyEvent.VK_R  // сначала нужно сделать пункт меню, а потом к нему добавить мнемонику:  menuItem.mnemonic = KeyEvent.VK_R
-
             addPainter(fp)
+
+
         }
 
     }
+
+    fun updatePlane(xMin: Double, xMax: Double, yMin: Double, yMax: Double) {
+        plane.also {
+            it.xMin = xMin
+            it.xMax = xMax
+            it.yMin = yMin
+            it.yMax = yMax
+        }
+    }
+
+    fun onUndo() {
+        val coords = history.undo()
+        if (coords != null) {
+            updatePlane(coords.xMin, coords.xMax, coords.yMin, coords.yMax)
+            repaint()
+        }
+    }
+
+    fun onReset() {
+        history.reset()
+        updatePlane(-2.0, 1.0, -1.0, 1.0)
+        repaint()
+    }
+
     fun changeColorScheme(i: Int){
         if(i ==1){fp.getColor = ::colorScheme1 }
         if(i==2){fp.getColor = ::colorScheme2 }
@@ -156,9 +157,9 @@ class MainWindow : JFrame(){
     }
     fun createMandelbrot(){
         title = "Построение множества Мандельброта"
-        val fractal = Mandelbrot()
+
         fp.isInSet = fractal::isInSet
-        fp.getColor = ::colorScheme5
+
     }
     fun createJulia(){
         title = "Построение множества Жюлия"
