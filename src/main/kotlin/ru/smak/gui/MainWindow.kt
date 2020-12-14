@@ -157,7 +157,6 @@ class MainWindow : JFrame(){
     }
     fun createMandelbrot(){
         title = "Построение множества Мандельброта"
-
         fp.isInSet = fractal::isInSet
 
     }

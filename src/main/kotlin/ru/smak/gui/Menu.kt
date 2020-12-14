@@ -1,13 +1,21 @@
 package ru.smak.gui
 
+import ru.smak.gui.graphics.LoadData
+import ru.smak.gui.graphics.SaveData
+import ru.smak.gui.graphics.SaveFormat
 import java.awt.event.KeyEvent
 import javax.swing.*
 import ru.smak.gui.graphics.SaveFractal
+import java.util.*
+import kotlin.collections.AbstractCollection
+
 class Menu(mw1: MainWindow): JFrame() {
     var menuBar = JMenuBar()
     val mw: MainWindow = mw1
-    val bgClr = ButtonGroup();
+    val bgClr = ButtonGroup()
+    val f1 : JRadioButtonMenuItem
     init{
+        f1 = JRadioButtonMenuItem("Множество Мандельброта", ImageIcon("icons/save.png"))
         //заполняем меню
         fillMenuBar()
         jMenuBar = menuBar
@@ -38,9 +46,7 @@ class Menu(mw1: MainWindow): JFrame() {
         //привязка к комбинации клавиш
         undoBtn.mnemonic = KeyEvent.VK_Z
         menuBar.add(undoBtn)
-        undoBtn.addActionListener{
-            //создать объект нужного класса и обратиться через него к нужной функции
-        }
+
         //кнопка сброса
         val resetBtn = JButton(ImageIcon("icons/reset15.png"))
         resetBtn.addActionListener {
@@ -56,6 +62,21 @@ class Menu(mw1: MainWindow): JFrame() {
         //Пункт меню "Открыть"
         val open = JMenuItem("Открыть", ImageIcon("icons/addfile.png"))
         open.addActionListener {
+            val sd = LoadData.loadData(mw.fp)
+            if(sd!=null) {
+                mw.fp.plane.let {
+                    it.xMin = sd.xMin
+                    it.xMax = sd.xMax
+                    it.yMin = sd.yMin
+                    it.yMax = sd.yMax
+                }
+                for (i in bgClr.elements){
+                    if(i.actionCommand== sd.color){
+                        i.doClick()
+                        break
+                    }
+                }
+            }
 
         }
         // Пункт меню "Сохранить как..."
@@ -63,6 +84,9 @@ class Menu(mw1: MainWindow): JFrame() {
         //Подпункты "Сохранить как..."
         val format1 = JMenuItem("Собственный формат", ImageIcon("icons/imagefile.png"))
         format1.addActionListener {
+            val sd = SaveData( mw.plane.xMin, mw.plane.xMax, mw.plane.yMin, mw.plane.yMax,bgClr.selection.actionCommand )
+            val s = SaveFormat(sd)
+            f1.doClick()
 
         }
         val format2 = JMenuItem("Изображение", ImageIcon("icons/image.png"))
@@ -94,9 +118,7 @@ class Menu(mw1: MainWindow): JFrame() {
         clr4.setActionCommand("colorScheme4")
 
         clr1.addActionListener { mw.changeColorScheme(1) }
-        clr2.addActionListener {
-            mw.changeColorScheme(2)
-        }
+        clr2.addActionListener { mw.changeColorScheme(2) }
         clr3.addActionListener { mw.changeColorScheme(3) }
         clr4.addActionListener { mw.changeColorScheme(4) }
         clr1.doClick()
@@ -113,7 +135,7 @@ class Menu(mw1: MainWindow): JFrame() {
         bgClr.selection.actionCommand
 
         //меню-переключатели для выбора фрактала
-        val f1 = JRadioButtonMenuItem("Множество Мандельброта", ImageIcon("icons/save.png"))
+        //f1 = JRadioButtonMenuItem("Множество Мандельброта", ImageIcon("icons/save.png"))
         f1.addActionListener {
             mw.createMandelbrot()
         }

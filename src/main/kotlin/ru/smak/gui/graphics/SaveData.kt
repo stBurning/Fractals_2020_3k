@@ -1,34 +1,53 @@
 package ru.smak.gui.graphics
 
 import java.awt.FileDialog
+import java.io.File
 import java.io.FileOutputStream
 import java.io.ObjectOutputStream
 import java.io.Serializable
+import java.util.*
 import java.util.logging.Filter
+import javax.imageio.ImageIO
+import javax.swing.AbstractButton
+import javax.swing.JFileChooser
+import javax.swing.JOptionPane
+import javax.swing.filechooser.FileNameExtensionFilter
 
 data class SaveData(
         var xMin: Double,
         var xMax: Double,
         var yMin: Double,
         var yMax: Double,
-        var color: Int
+        var color: String
 ):Serializable{
     override fun toString() = "$xMin,$xMax,$yMin,$yMax,$color"
 }
 //Класс, внутри которого осуществляется сохранение
 @Suppress("DEPRECATION") // эта штука появилась, после написания show, я не знаю, что это , у меня лапки
-class SaveFormat(fsd: FileDialog, sd: SaveData){
+class SaveFormat( sd: SaveData){
 
     init {
-        // открытие диалогого окна
-        fsd.show()
-        // в if проверяем file, если оно не null, то оно содержит название файла и нажата кнопочка "сохранить"
-        //если null, действие отменено, т.е. нажато "отмена"
-
-                //TODO: надо сделать фильтр =(
-        if(fsd.file!=null){
-            save(fsd.file.toString(), sd)
+        val fileChooser = JFileChooser()
+        with(fileChooser) {
+            dialogTitle = "Сохранение файла..."
+            val filter1 = FileNameExtensionFilter("dat", "dat")
+            addChoosableFileFilter(filter1)
         }
+        fileChooser.fileSelectionMode = JFileChooser.OPEN_DIALOG
+        val result = fileChooser.showSaveDialog(fileChooser)
+        if (result == JFileChooser.APPROVE_OPTION) {
+            var str = fileChooser.selectedFile.absolutePath
+            if (fileChooser.selectedFile.extension == "") {
+                if (fileChooser.fileFilter.description != "All Files")
+                    str = str + "." + fileChooser.fileFilter.description
+                else str += ".dat"
+            }
+            save(str,sd)
+            JOptionPane.showMessageDialog(fileChooser,
+                    "Файл '" + str +
+                            "' сохранен")
+        }
+
     }
 
     /**
