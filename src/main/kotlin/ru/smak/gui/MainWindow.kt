@@ -19,6 +19,10 @@ class MainWindow(Video: VideoWindow) : JFrame() {
     private val history = History()
     private val minSize = Dimension(300, 200)
     private val mainPanel: GraphicsPanel
+    internal val fp: FractalPainter
+    internal val plane:  CartesianScreenPlane
+    internal var updated:Boolean=false
+    val fractal = Mandelbrot()
 
     /*
     Экземпляр класса videoWindow
@@ -32,14 +36,15 @@ class MainWindow(Video: VideoWindow) : JFrame() {
     Включать и выключать динамическую детализацию
     video.videoPanel.fractal.maxIters = value
     */
-    private val video = Video
+    internal val video = Video
 
 //    private val buttonBack = JButton("Назад")
 //    private val buttonReset = JButton("Сбросить")
     init{
+
         defaultCloseOperation = EXIT_ON_CLOSE
         title = "Построение множества Мандельброта"
-        minimumSize = Dimension(1600, 900)
+        minimumSize = Dimension(600, 600)
         mainPanel = GraphicsPanel()
         layout = GroupLayout(contentPane).apply {
             setVerticalGroup(
@@ -61,42 +66,30 @@ class MainWindow(Video: VideoWindow) : JFrame() {
 
         pack()
 
-
-        val plane = CartesianScreenPlane(
+        plane = CartesianScreenPlane(
             mainPanel.width, mainPanel.height,
             -2.0, 1.0, -1.0, 1.0
         )
 
-
         val mfp = SelectionFramePainter(mainPanel.graphics)
+
+        //createMandelbrot()
+       // fractal = Mandelbrot()
+
+
+
         val fractal = Mandelbrot()
-        val fp = FractalPainter(plane)
-        fp.isInSet = fractal::isInSet
-        fp.getColor = ::colorScheme5
+        fp = FractalPainter(plane)
+
+        val menu = Menu(this)
+        jMenuBar = menu.jMenuBar
+
+
+
+
+
+
         fp.addImageReadyListener { mainPanel.repaint() }
-
-        fun updatePlane(xMin: Double, xMax: Double, yMin: Double, yMax: Double) {
-            plane.also {
-                it.xMin = xMin
-                it.xMax = xMax
-                it.yMin = yMin
-                it.yMax = yMax
-            }
-        }
-
-        fun onUndo() {
-            val coords = history.undo()
-            if (coords != null) {
-                updatePlane(coords.xMin, coords.xMax, coords.yMin, coords.yMax)
-                repaint()
-            }
-        }
-
-        fun onReset() {
-            history.reset()
-            updatePlane(-2.0, 1.0, -1.0, 1.0)
-            repaint()
-        }
 
         with (mainPanel){
             background = Color.WHITE
@@ -106,7 +99,6 @@ class MainWindow(Video: VideoWindow) : JFrame() {
                     plane.realHeight = mainPanel.height
                     mfp.g = mainPanel.graphics
                     mainPanel.repaint()
-
                 }
             })
             addMouseListener(object : MouseAdapter() {
@@ -121,7 +113,6 @@ class MainWindow(Video: VideoWindow) : JFrame() {
                         }
                     }
                 }
-
                 override fun mouseReleased(e: MouseEvent?) {
                     e?.let {
                         mfp.currentPoint = it.point
@@ -136,7 +127,9 @@ class MainWindow(Video: VideoWindow) : JFrame() {
                             val yMin = Converter.yScr2Crt(y + height, plane)
                             val yMax = Converter.yScr2Crt(y, plane)
                             val new = Coords(xMin,xMax,yMin,yMax)
-                            fractal.updateMaxIterations(new,old)  //добавить флажок с менюшниками
+                            if(updated) {
+                                fractal.updateMaxIterations(new, old)  //добавить флажок с менюшниками
+                            }
                             updatePlane(xMin, xMax, yMin, yMax)
                         }
                     }
@@ -162,6 +155,92 @@ class MainWindow(Video: VideoWindow) : JFrame() {
 //            buttonReset.mnemonic = KeyEvent.VK_R  // сначала нужно сделать пункт меню, а потом к нему добавить мнемонику:  menuItem.mnemonic = KeyEvent.VK_R
 
             addPainter(fp)
+
+
         }
+
+    }
+
+    fun updatePlane(xMin: Double, xMax: Double, yMin: Double, yMax: Double) {
+        plane.also {
+            it.xMin = xMin
+            it.xMax = xMax
+            it.yMin = yMin
+            it.yMax = yMax
+        }
+        video.videoPanel.plane.also {
+            it.xMin = xMin
+            it.xMax = xMax
+            it.yMin = yMin
+            it.yMax = yMax
+        }
+    }
+
+    fun onUndo() {
+        val coords = history.undo()
+        if (coords != null) {
+            updatePlane(coords.xMin, coords.xMax, coords.yMin, coords.yMax)
+            repaint()
+        }
+    }
+
+    fun onReset() {
+        history.reset()
+        updatePlane(-2.0, 1.0, -1.0, 1.0)
+        repaint()
+    }
+
+    fun changeColorScheme(i: Int){
+        if(i ==1){
+            fp.getColor = ::colorScheme1
+            video.videoPanel.fp.getColor= ::colorScheme1
+        }
+        if(i==2){
+            fp.getColor = ::colorScheme2
+            video.videoPanel.fp.getColor= ::colorScheme2
+        }
+        if(i==3){
+            fp.getColor = ::colorScheme3
+            video.videoPanel.fp.getColor= ::colorScheme3
+        }
+        if(i==4){
+            fp.getColor = ::colorScheme4
+            video.videoPanel.fp.getColor= ::colorScheme4
+        }
+        repaint()
+    }
+    fun createMandelbrot(){
+        title = "Построение множества Мандельброта"
+        fp.isInSet = fractal::isInSet
+
+    }
+    fun createJulia(){
+        title = "Построение множества Жюлия"
+        // тут для Жюлия так же как и в createMandelbrot()
+        //функции для fp!!!
+    }
+    //sd:SaveData
+    fun open(){
+        val plane1 = CartesianScreenPlane(
+                mainPanel.width, mainPanel.height,
+                -2.0, 1.0, -1.0, 1.0
+        )
+        fp.plane.let {
+            it.xMin = -2.0
+            it.xMax = 1.0
+            it.yMin = -1.0
+            it.yMax = 1.0
+        }
+
+        /*
+        в итоге будет так
+        fp.plane.let {
+            it.xMin = sd.xMin
+            it.xMax = sd.xMax
+            it.yMin = sd.yMin
+            it.yMax = sd.yMax
+        }*/
+        changeColorScheme(3)
+        createMandelbrot()
     }
 }
