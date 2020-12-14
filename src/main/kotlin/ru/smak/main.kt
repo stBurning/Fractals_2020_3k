@@ -1,7 +1,9 @@
 package ru.smak
 
 import ru.smak.gui.MainWindow
+import ru.taerd.gui.VideoWindow
 
 fun main() {
-    MainWindow().apply { isVisible = true }
+    val v = VideoWindow().apply { isVisible = true }
+    MainWindow(v).apply { isVisible = false }
 }
