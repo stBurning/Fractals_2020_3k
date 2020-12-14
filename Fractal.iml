@@ -23,5 +23,6 @@
     </orderEntry>
     <orderEntry type="module" module-name="Complex" />
     <orderEntry type="module" module-name="GraphicsPanel" />
+    <orderEntry type="module" module-name="VideoRecorder.main" />
   </component>
 </module>

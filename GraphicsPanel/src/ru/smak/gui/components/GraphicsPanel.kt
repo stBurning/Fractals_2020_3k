@@ -4,7 +4,7 @@ import ru.smak.gui.graphics.Painter
 import java.awt.Graphics
 import javax.swing.JPanel
 
-class GraphicsPanel : JPanel(){
+open class GraphicsPanel : JPanel(){
     private val painters: MutableList<Painter> = mutableListOf()
 
     override fun paint(g: Graphics?) {
@@ -21,5 +21,4 @@ class GraphicsPanel : JPanel(){
         if (painters.contains(p))
             painters.remove(p)
     }
-
 }
