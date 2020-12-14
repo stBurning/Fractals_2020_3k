@@ -17,6 +17,7 @@ import kotlin.concurrent.thread
  * Класс дополнительного окна,для создания видео по фреймам
  */
 class VideoWindow : JFrame() {
+
     private val minSizeVidePanel = Dimension(400, 400)
     private val minSizePlaneScroll = Dimension(200, 380)
 
