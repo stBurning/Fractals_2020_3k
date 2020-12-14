@@ -16,7 +16,7 @@ class Menu(mw1: MainWindow): JFrame() {
     val detail = JCheckBox("Детализация ")
     val f1 : JRadioButtonMenuItem
     init{
-        f1 = JRadioButtonMenuItem("Множество Мандельброта", ImageIcon("icons/save.png"))
+        f1 = JRadioButtonMenuItem("Множество Мандельброта")
         //заполняем меню
         fillMenuBar()
         jMenuBar = menuBar
@@ -30,6 +30,9 @@ class Menu(mw1: MainWindow): JFrame() {
         //кнопка для записи видео
         val videoBtn = JButton("Записать видео ", ImageIcon("icons/video.png"))
         menuBar.add(videoBtn)
+        videoBtn.addActionListener {
+            mw.video.isVisible = true
+        }
         menuBar.add(Box.createHorizontalGlue())//пробел
         //поле с галочкой для детализации
 
@@ -109,13 +112,13 @@ class Menu(mw1: MainWindow): JFrame() {
         val fractal = JMenu("Фрактал")
 
         // меню-переключатели для цветов
-        val clr1 = JRadioButtonMenuItem("Цветовая схема 1", ImageIcon("icons/save.png"))
+        val clr1 = JRadioButtonMenuItem("Цветовая схема 1")
         clr1.setActionCommand("colorScheme1")
-        val clr2 = JRadioButtonMenuItem("Цветовая схема 2", ImageIcon("icons/save.png"))
+        val clr2 = JRadioButtonMenuItem("Цветовая схема 2")
         clr2.setActionCommand("colorScheme2")
-        val clr3 = JRadioButtonMenuItem("Цветовая схема 3", ImageIcon("icons/save.png"))
+        val clr3 = JRadioButtonMenuItem("Цветовая схема 3")
         clr3.setActionCommand("colorScheme3")
-        val clr4 = JRadioButtonMenuItem("Цветовая схема 4", ImageIcon("icons/save.png"))
+        val clr4 = JRadioButtonMenuItem("Цветовая схема 4")
         clr4.setActionCommand("colorScheme4")
 
         clr1.addActionListener { mw.changeColorScheme(1) }
@@ -141,7 +144,7 @@ class Menu(mw1: MainWindow): JFrame() {
             mw.createMandelbrot()
         }
         f1.doClick()
-        val f2 = JRadioButtonMenuItem("Множество Жюлиа", ImageIcon("icons/save.png"))
+        val f2 = JRadioButtonMenuItem("Множество Жюлиа")
         f2.addActionListener {
             mw.createJulia()
         }

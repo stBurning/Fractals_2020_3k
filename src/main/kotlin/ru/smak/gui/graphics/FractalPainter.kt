@@ -19,7 +19,7 @@ class FractalPainter(
     private var recreate = true
     private var stop = false
     var bi = BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB)
-    private var savedImage = BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB)
+    //private var savedImage = BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB)
 
     var savedImage = BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB)
     private var partsDone = 0

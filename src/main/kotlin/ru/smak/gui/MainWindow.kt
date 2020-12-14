@@ -36,7 +36,7 @@ class MainWindow(Video: VideoWindow) : JFrame() {
     Включать и выключать динамическую детализацию
     video.videoPanel.fractal.maxIters = value
     */
-    private val video = Video
+    internal val video = Video
 
 //    private val buttonBack = JButton("Назад")
 //    private val buttonReset = JButton("Сбросить")
@@ -44,7 +44,7 @@ class MainWindow(Video: VideoWindow) : JFrame() {
 
         defaultCloseOperation = EXIT_ON_CLOSE
         title = "Построение множества Мандельброта"
-        minimumSize = Dimension(1600, 900)
+        minimumSize = Dimension(600, 600)
         mainPanel = GraphicsPanel()
         layout = GroupLayout(contentPane).apply {
             setVerticalGroup(
@@ -164,6 +164,12 @@ class MainWindow(Video: VideoWindow) : JFrame() {
             it.yMin = yMin
             it.yMax = yMax
         }
+        video.videoPanel.plane.also {
+            it.xMin = xMin
+            it.xMax = xMax
+            it.yMin = yMin
+            it.yMax = yMax
+        }
     }
 
     fun onUndo() {
@@ -181,10 +187,22 @@ class MainWindow(Video: VideoWindow) : JFrame() {
     }
 
     fun changeColorScheme(i: Int){
-        if(i ==1){fp.getColor = ::colorScheme1 }
-        if(i==2){fp.getColor = ::colorScheme2 }
-        if(i==3){fp.getColor = ::colorScheme3 }
-        if(i==4){fp.getColor = ::colorScheme4 }
+        if(i ==1){
+            fp.getColor = ::colorScheme1
+            video.videoPanel.fp.getColor= ::colorScheme1
+        }
+        if(i==2){
+            fp.getColor = ::colorScheme2
+            video.videoPanel.fp.getColor= ::colorScheme2
+        }
+        if(i==3){
+            fp.getColor = ::colorScheme3
+            video.videoPanel.fp.getColor= ::colorScheme3
+        }
+        if(i==4){
+            fp.getColor = ::colorScheme4
+            video.videoPanel.fp.getColor= ::colorScheme4
+        }
         repaint()
     }
     fun createMandelbrot(){
