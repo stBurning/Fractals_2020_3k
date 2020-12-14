@@ -27,20 +27,16 @@ class FractalPainter(
     fun addImageReadyListener(l: () -> Unit) {
         imageReadyListeners.add(l)
     }
-
     fun removeImageReadyListener(l: () -> Unit) {
         imageReadyListeners.remove(l)
     }
-
     private val getImageListeners: MutableList<(BufferedImage) -> Unit> = mutableListOf()
     fun addGetImageListener(l: (BufferedImage) -> Unit) {
         getImageListeners.add(l)
     }
-
     fun removeGetImageListener(l: (BufferedImage) -> Unit) {
         getImageListeners.remove(l)
     }
-
     companion object {
         /**
          * Количество параллельных подпроцессов для построения фрактала
@@ -127,6 +123,10 @@ class FractalPainter(
             recreate = true
             return
         }
+        create()
+
+    }
+    private fun create(){
         stop = true
         stripList.forEach { it.thread?.join() }
         stripList.clear()
@@ -140,7 +140,13 @@ class FractalPainter(
         }
     }
     fun getImage():BufferedImage{
-        stripList.forEach { it.thread?.join() }
+
+        create()
+        stripList.forEach {
+            it.thread?.join()
+        }
+        finished()
+        println("Изображение готово")
         return savedImage
     }
 
