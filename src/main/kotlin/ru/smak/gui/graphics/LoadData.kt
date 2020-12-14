@@ -13,7 +13,6 @@ import javax.swing.JFileChooser
 import javax.swing.JOptionPane
 import javax.swing.filechooser.FileNameExtensionFilter
 
-@Suppress("DEPRECATION")
 object LoadData{
     fun loadData(fp: FractalPainter):SaveData?{
         val fileChooser = JFileChooser()
@@ -32,7 +31,7 @@ object LoadData{
             if (fileChooser.selectedFile.extension == "") {
                 println("Error")
             }
-            val l = load(name,0)
+            val l = load(name)
             if(l!=null) {
                 return l
                // open(fp, l)
@@ -49,20 +48,16 @@ object LoadData{
         }
     }
 
-    fun load(name : String, i: Int):SaveData?{
-        //TODO : переписать, без i
+    fun load(name : String):SaveData?{
         val `is` = FileInputStream(name)
         val isw = ObjectInputStream(`is`)
-        var cnt = 0
         while(true){
             try{
                 val d = isw.readObject() as? SaveData
-                if(cnt==i)
-                    return d
+                return d
             }catch (e: EOFException){
                 break
             }
-            cnt++
         }
         return null
     }

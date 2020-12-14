@@ -18,12 +18,11 @@ data class SaveData(
         var xMax: Double,
         var yMin: Double,
         var yMax: Double,
-        var color: String
+        var color: String,
+        var detail: Boolean
 ):Serializable{
-    override fun toString() = "$xMin,$xMax,$yMin,$yMax,$color"
+    override fun toString() = "$xMin,$xMax,$yMin,$yMax,$color,$detail"
 }
-//Класс, внутри которого осуществляется сохранение
-@Suppress("DEPRECATION") // эта штука появилась, после написания show, я не знаю, что это , у меня лапки
 class SaveFormat( sd: SaveData){
 
     init {

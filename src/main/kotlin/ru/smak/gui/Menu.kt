@@ -13,6 +13,7 @@ class Menu(mw1: MainWindow): JFrame() {
     var menuBar = JMenuBar()
     val mw: MainWindow = mw1
     val bgClr = ButtonGroup()
+    val detail = JCheckBox("Детализация ")
     val f1 : JRadioButtonMenuItem
     init{
         f1 = JRadioButtonMenuItem("Множество Мандельброта", ImageIcon("icons/save.png"))
@@ -27,13 +28,11 @@ class Menu(mw1: MainWindow): JFrame() {
         menuBar.add(createFileMenu())
         menuBar.add(createEditMenu())
         //кнопка для записи видео
-        //val vidoBtn = JButton(ImageIcon("src/video.png"), "Записать видео")
         val videoBtn = JButton("Записать видео ", ImageIcon("icons/video.png"))
-        //videoBtn.border = BorderFactory.createEtchedBorder()
         menuBar.add(videoBtn)
         menuBar.add(Box.createHorizontalGlue())//пробел
         //поле с галочкой для детализации
-        val detail = JCheckBox("Детализация ")
+
         detail.addActionListener{
             mw.updated = detail.isSelected
         }
@@ -76,6 +75,8 @@ class Menu(mw1: MainWindow): JFrame() {
                         break
                     }
                 }
+                if (sd.detail) detail.isSelected =true
+                else detail.isSelected = false
             }
 
         }
@@ -84,14 +85,14 @@ class Menu(mw1: MainWindow): JFrame() {
         //Подпункты "Сохранить как..."
         val format1 = JMenuItem("Собственный формат", ImageIcon("icons/imagefile.png"))
         format1.addActionListener {
-            val sd = SaveData( mw.plane.xMin, mw.plane.xMax, mw.plane.yMin, mw.plane.yMax,bgClr.selection.actionCommand )
+            val sd = SaveData( mw.plane.xMin, mw.plane.xMax, mw.plane.yMin, mw.plane.yMax,bgClr.selection.actionCommand,detail.isSelected )
             val s = SaveFormat(sd)
             f1.doClick()
 
         }
         val format2 = JMenuItem("Изображение", ImageIcon("icons/image.png"))
         format2.addActionListener {
-            SaveFractal.invoke(mw.plane,mw.fp.savedImage, mw.updated,bgClr.selection.actionCommand )
+            SaveFractal.invoke(mw.plane,mw.fp.savedImage, mw.updated,bgClr.selection.actionCommand)
         }
         //Добавление подпунктов в пункты
         save.add(format1)
