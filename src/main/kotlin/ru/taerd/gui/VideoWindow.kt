@@ -283,6 +283,9 @@ class VideoWindow : JFrame() {
             addMouseListener(object : MouseAdapter() {
                 override fun mouseClicked(e: MouseEvent?) {
                     super.mouseClicked(e)
+                    startButton.isEnabled = false
+                    addFrameButton.isEnabled = false
+                    removeFrameButton.isEnabled = false
                     timeBetweenFrames = getValidValue(textField.text)
                     val snapsCount = timeBetweenFrames * fps
 
@@ -311,6 +314,9 @@ class VideoWindow : JFrame() {
                     videoProcessor!!.addFinishListener {
                         progressTextLabel.isVisible=false
                         progressBar.isVisible=false
+                        startButton.isEnabled = true
+                        addFrameButton.isEnabled = true
+                        removeFrameButton.isEnabled = true
                         JOptionPane.showMessageDialog(videoPanel, "Видео создано")
                     }
                     thread { videoProcessor!!.run() }
@@ -322,6 +328,9 @@ class VideoWindow : JFrame() {
             addMouseListener(object : MouseAdapter() {
                 override fun mouseClicked(e: MouseEvent?) {
                     super.mouseClicked(e)
+                    startButton.isEnabled = true
+                    addFrameButton.isEnabled = true
+                    removeFrameButton.isEnabled = true
                     try {
                         videoProcessor?.disable()
                         imageProducers.forEach { imageProducer ->
