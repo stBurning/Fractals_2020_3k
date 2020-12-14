@@ -3,26 +3,52 @@ package ru.smak.gui.graphics
 import ru.smak.math.fractals.Mandelbrot
 import java.awt.FileDialog
 import java.io.EOFException
+import java.io.File
 import java.io.FileInputStream
 import java.io.ObjectInputStream
+import java.util.*
+import javax.imageio.ImageIO
+import javax.swing.AbstractButton
+import javax.swing.JFileChooser
+import javax.swing.JOptionPane
+import javax.swing.filechooser.FileNameExtensionFilter
+
 @Suppress("DEPRECATION")
-class LoadData (fsd: FileDialog,fp: FractalPainter){
-    init {
-        fsd.show()
-                //проверка какая кнопка нажата, аналогично с SaveData, суть можно посмотреть там.
-        if(fsd.file!=null){
-            //вызов функции для сохранения.
-            val sd = load(fsd.file,0)
-            if(sd!=null){
-                open(fp, sd)
-            }else{
-                println("Не удалось открыть")
+object LoadData{
+    fun loadData(fp: FractalPainter):SaveData?{
+        val fileChooser = JFileChooser()
+        with(fileChooser) {
+            dialogTitle = "Открытие файла..."
+            val filter1 = FileNameExtensionFilter("dat", "dat")
+            addChoosableFileFilter(filter1)
+        }
+
+        fileChooser.fileSelectionMode = JFileChooser.OPEN_DIALOG
+        val result = fileChooser.showOpenDialog(fileChooser)
+        if (result == JFileChooser.APPROVE_OPTION) {
+
+            var name = fileChooser.selectedFile.absolutePath
+
+            if (fileChooser.selectedFile.extension == "") {
+                println("Error")
             }
-            //дальше
+            val l = load(name,0)
+            if(l!=null) {
+                return l
+               // open(fp, l)
+               // JOptionPane.showMessageDialog(fileChooser,
+               //         "Файл открыт")
+            }else {
+                JOptionPane.showMessageDialog(fileChooser,
+                        "Произошла ошибка")
+                return null
+            }
+
+        }else{
+            return null
         }
     }
-    // туть весь код, как на паре и оно работает
-    //TODO: нужно ли нам i ( если в 1 файле храниться информация только об одном рисунке, то i не нужен)
+
     fun load(name : String, i: Int):SaveData?{
         //TODO : переписать, без i
         val `is` = FileInputStream(name)
@@ -40,16 +66,23 @@ class LoadData (fsd: FileDialog,fp: FractalPainter){
         }
         return null
     }
-    fun open(fp: FractalPainter, sd:SaveData){
+    fun open(fp: FractalPainter, sd:SaveData, list: Enumeration<AbstractButton>){
+
         fp.plane.let {
             it.xMin = sd.xMin
             it.xMax = sd.xMax
             it.yMin = sd.yMin
             it.yMax = sd.yMax
         }
-        val fractal = Mandelbrot()
-        fp.isInSet = fractal::isInSet
-        fp.getColor = ::colorScheme5
+
+        for (i in list){
+            if(i.name == sd.color){
+                i.doClick()
+                break
+            }
+        }
+
     }
 
 }
+
