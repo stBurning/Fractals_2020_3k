@@ -8,9 +8,11 @@ import java.util.concurrent.LinkedBlockingQueue
 
 
 /** (Consumer) Класс, получающий через очередь изображения и собирающий их в видео
- * @param queue BlockingQueue - очередь, осуществляющая связь с (Producers)
+ * @param queue ConcurrentLinkedQueue - очередь, осуществляющая связь с (Producers)
  * @param width ширина изображений
- * @param height высота изображений*/
+ * @param height высота изображений
+ * @param duration длительность выидео
+ * @param fps количество кадров в секунду*/
 class VideoProcessor(
     private val queue: LinkedBlockingQueue<BufferedImage>,
     private val width: Int,
@@ -18,10 +20,14 @@ class VideoProcessor(
     private val duration: Int,
     private val fps: Int
 ) : Runnable {
+
+    private var disable = true
+
     /**
      * Функция создания видео в потоке
      * @param fileName название файла вместе с форматом
      * @param formatName формат видео (avi, mp4, mpeg, ...)
+     * @param duration длительность видео
      * @param fps количество кадров в секундв
      */
     @Throws(AWTException::class, InterruptedException::class, IOException::class)
@@ -33,10 +39,8 @@ class VideoProcessor(
         /** Контейнер для видео-файла */
         val muxer = Muxer.make(fileName, null, formatName)
 
-        /** Now, we need to decide what type of codec to use to encode video. Muxers
-         * have limited sets of codecs they can use. We're going to pick the first one that
-         * works, or if the user supplied a codec name, we're going to force-fit that
-         * in instead.
+        /**
+         * Выбираем кодек, подходящий к формату фидео
          */
         val format = muxer.format
         val codec: Codec = Codec.findEncodingCodec(format.defaultVideoCodecId)
@@ -51,10 +55,7 @@ class VideoProcessor(
         val pixelFormat = PixelFormat.Type.PIX_FMT_YUV420P
         encoder.pixelFormat = pixelFormat
         encoder.timeBase = framerate
-        /** An annoynace of some formats is that they need global (rather than per-stream) headers,
-         * and in that case you have to tell the encoder. And since Encoders are decoupled from
-         * Muxers, there is no easy way to know this beyond
-         */
+        /** Устанавливаем флаги*/
         if (format.getFlag(ContainerFormat.Flag.GLOBAL_HEADER)) encoder.setFlag(Coder.Flag.FLAG_GLOBAL_HEADER, true)
         /** Открываем энкодер.  */
         encoder.open(null, null)
@@ -62,12 +63,7 @@ class VideoProcessor(
         muxer.addNewStream(encoder)
         /** Открываем контейнер.  */
         muxer.open(null, null)
-        /** Next, we need to make sure we have the right MediaPicture format objects
-         * to encode data with. Java (and most on-screen graphics programs) use some
-         * variant of Red-Green-Blue image encoding (a.k.a. RGB or BGR). Most video
-         * codecs use some variant of YCrCb formatting. So we're going to have to
-         * convert. To do that, we'll introduce a MediaPictureConverter object later. object.
-         */
+        /** Конвертер, для преобразования в к нужному формату изображения*/
         var converter: MediaPictureConverter? = null
         val picture = MediaPicture.make(
             encoder.width,
@@ -79,13 +75,18 @@ class VideoProcessor(
         val packet = MediaPacket.make()
         var i = 0
         while (i < duration / framerate.double) {
+            if (disable) {
+                muxer.close()
+                println("Поток Видео завершен")
+                return
+            }
             //Получаем изображение из очереди если оно доступно, иначе ждем
             val img = queue.take()
             val newImg = BufferedImage(width, height, BufferedImage.TYPE_INT_RGB)
             newImg.graphics.drawImage(img, 0, 0, null)
+            /** Конвертируем изображение*/
             val image = convertToType(newImg, BufferedImage.TYPE_3BYTE_BGR)
             println("[Encoder] Изображение $i добавлено")
-            /** This is LIKELY not in YUV420P format, so we're going to convert it using some handy utilities.  */
             if (converter == null) converter = MediaPictureConverterFactory.createConverter(image, picture)
             converter!!.toPicture(picture, image, i.toLong())
             do {
@@ -100,7 +101,7 @@ class VideoProcessor(
         } while (packet.isComplete)
         /** Закрываем контейнер.*/
         muxer.close()
-        println("Done!")
+        println("Создании видео завершено!")
     }
 
     /**
@@ -128,7 +129,14 @@ class VideoProcessor(
         return image
     }
 
+    fun disable(){
+        disable = true
+        println("Потребитель остановлен")
+    }
+
     override fun run() {
-        createVideo("test1.avi", "avi", duration, fps)
+        disable = false
+        println("Потребитель запущен")
+        createVideo("fractal.avi", "avi", duration, fps)
     }
 }

@@ -1,8 +1,8 @@
 package ru.taerd.gui
 
 import VideoProcessor
-import ru.smak.gui.graphics.FractalPainter
 import ru.smak.gui.graphics.convertation.CartesianScreenPlane
+import ru.taerd.ImageProducer
 import ru.taerd.panels.VideoPanel
 import java.awt.Dimension
 import java.awt.event.MouseAdapter
@@ -11,7 +11,7 @@ import java.awt.image.BufferedImage
 import java.util.concurrent.LinkedBlockingQueue
 import javax.swing.*
 import kotlin.concurrent.thread
-import kotlin.math.abs
+
 
 /**
  * Класс дополнительного окна,для создания видео по фреймам
@@ -29,15 +29,20 @@ class VideoWindow : JFrame() {
     private val minSizeTextField = Dimension(80, 20)
     private val minSizeTextLabel = Dimension(220, 20)
 
-    //Creating Video
-    private val queue = LinkedBlockingQueue<BufferedImage>(100)
+    private val minSizeProgressTextField = Dimension(150,20)
+    private val minSizeProgressBar = Dimension(150,20)
+
+    //Компоненты для создания видео
+    private val queue = LinkedBlockingQueue<BufferedImage>(300)
     private var videoProcessor: VideoProcessor? = null
-    private var t = thread { videoProcessor }
+    private var imageProducer: ImageProducer? = null
+    private var tVideoProcessor: Thread? = null
+    private var tImageProducer: Thread? = null
     private val fps = 60
     private val WIDTH = 1920
     private val HEIGHT = 1080
 
-    //components
+    //Компоненты окна
     val videoPanel: VideoPanel
     private val addFrameButton = JButton("Добавить")
     private val startButton = JButton("Создать")
@@ -45,6 +50,8 @@ class VideoWindow : JFrame() {
     private val stopButton = JButton("Остановить")
     private val textField = JTextField("10")
     private val textLabel = JLabel("Время между переходами по кадрам")
+    private val progressBar = JProgressBar(0,100)
+    private val progressTextLabel = JLabel("Процент выполнения")
 
     private val dlm = DefaultListModel<String>()
     private var list = JList(dlm)
@@ -52,17 +59,17 @@ class VideoWindow : JFrame() {
 
     private var timeBetweenFrames = 0
 
-    //Можно будет удалить и использовать dlm
     private val frameList = mutableListOf<CartesianScreenPlane>()
 
     init {
-
         defaultCloseOperation.apply {
             isVisible = false
         }
         title = "Составление видео из кадров"
         minimumSize = Dimension(950, 700)
         videoPanel = VideoPanel()
+        progressBar.isVisible = false
+        progressTextLabel.isVisible = false
         layout = GroupLayout(contentPane).apply {
             setVerticalGroup(
                 createSequentialGroup()
@@ -135,8 +142,24 @@ class VideoWindow : JFrame() {
                                                 GroupLayout.DEFAULT_SIZE
                                             )
                                     )
+                                        .addGap(4)
+                                        .addGroup(
+                                                createParallelGroup()
+                                                        .addComponent(
+                                                                progressTextLabel,
+                                                                minSizeProgressTextField.height,
+                                                                minSizeProgressTextField.height,
+                                                                GroupLayout.DEFAULT_SIZE
+                                                        )
+                                                        .addGap(4)
+                                                        .addComponent(
+                                                                progressBar,
+                                                                minSizeProgressBar.height,
+                                                                minSizeProgressBar.height,
+                                                                GroupLayout.PREFERRED_SIZE
+                                                        )
+                                        )
                             )
-
                     )
                     .addGap(4)
             )
@@ -204,6 +227,23 @@ class VideoWindow : JFrame() {
                                         GroupLayout.DEFAULT_SIZE
                                     )
                             )
+                                .addGap(4)
+                                .addGroup(
+                                        createSequentialGroup()
+                                                .addComponent(
+                                                        progressTextLabel,
+                                                        minSizeProgressTextField.width,
+                                                        minSizeProgressTextField.width,
+                                                        GroupLayout.DEFAULT_SIZE
+                                                )
+                                                .addGap(4)
+                                                .addComponent(
+                                                        progressBar,
+                                                        minSizeProgressBar.width,
+                                                        minSizeProgressBar.width,
+                                                        GroupLayout.PREFERRED_SIZE
+                                                )
+                                )
                     )
                     .addGap(4)
             )
@@ -239,43 +279,23 @@ class VideoWindow : JFrame() {
                 }
             })
         }
+
         with(startButton) {
             //Событие возникающее при нажатии на создание видео
             addMouseListener(object : MouseAdapter() {
                 override fun mouseClicked(e: MouseEvent?) {
                     super.mouseClicked(e)
-
+                    println("Кнопка создания видео нажата")
                     timeBetweenFrames = getValidValue(textField.text)
                     val snapsCount = timeBetweenFrames * fps
                     videoProcessor = VideoProcessor(queue, WIDTH, HEIGHT, timeBetweenFrames * (frameList.size - 1), fps)
+                    imageProducer = ImageProducer(0 ,queue, WIDTH, HEIGHT, frameList, snapsCount)
                     thread { videoProcessor!!.run() }
-                    videoPanel.plane.apply {
-                        realHeight = HEIGHT
-                        realWidth = WIDTH
-                    }
+                    thread { imageProducer!!.run() }
 
-                    for (i in 0 until frameList.size - 1) {
-
-                        val xMinDt = abs(frameList[i].xMin - frameList[i + 1].xMin) / snapsCount
-                        val xMaxDt = abs(frameList[i].xMax - frameList[i + 1].xMax) / snapsCount
-                        val yMinDt = abs(frameList[i].yMin - frameList[i + 1].yMin) / snapsCount
-                        val yMaxDt = abs(frameList[i].yMax - frameList[i + 1].yMax) / snapsCount
-
-
-                        for (j in 0..snapsCount) {
-                            videoPanel.plane.apply {
-                                xMin = frameList[i].xMin + xMinDt * j
-                                xMax = frameList[i].xMax - xMaxDt * j
-                                yMin = frameList[i].yMin + yMinDt * j
-                                yMax = frameList[i].yMax - yMaxDt * j
-                            }
-
-
-                            videoPanel.paint(videoPanel.graphics)
-                            queue.put(videoPanel.fp.getImage())
-                        }
-                    }
-                    println("Image Generating finished!")
+                    //progressTextLabel.isVisible=true
+                    //progressBar.isVisible=true
+                    //progressBar.value=(persent)
                 }
             })
         }
@@ -284,6 +304,13 @@ class VideoWindow : JFrame() {
             addMouseListener(object : MouseAdapter() {
                 override fun mouseClicked(e: MouseEvent?) {
                     super.mouseClicked(e)
+                    try {
+                        videoProcessor!!.disable()
+                        imageProducer!!.disable()
+                    } catch (e: InterruptedException) {
+                        println("Interrupt")
+                    }
+
                     //Блокировка и удаление потоков отрисовки фреймов
                 }
             })
