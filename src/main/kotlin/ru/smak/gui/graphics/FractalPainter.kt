@@ -146,7 +146,6 @@ class FractalPainter(
             it.thread?.join()
         }
         finished()
-        println("Изображение готово")
         return savedImage
     }
 

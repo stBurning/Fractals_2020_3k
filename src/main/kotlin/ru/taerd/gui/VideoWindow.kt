@@ -30,14 +30,13 @@ class VideoWindow : JFrame() {
     private val minSizeTextLabel = Dimension(220, 20)
 
     //Компоненты для создания видео
-    private val queue = LinkedBlockingQueue<BufferedImage>(300)
+    private val queueList = mutableListOf<LinkedBlockingQueue<BufferedImage>>()
     private var videoProcessor: VideoProcessor? = null
-    private var imageProducer: ImageProducer? = null
-    private var tVideoProcessor: Thread? = null
-    private var tImageProducer: Thread? = null
-    private val fps = 60
-    private val WIDTH = 1920
-    private val HEIGHT = 1080
+    private var imageProducers = mutableListOf<ImageProducer>()
+    private val PRODUCERS_COUNT = 2
+    private val fps = 30
+    private val WIDTH = 1600
+    private val HEIGHT = 900
 
     //Компоненты окна
     val videoPanel: VideoPanel
@@ -249,10 +248,18 @@ class VideoWindow : JFrame() {
                     println("Кнопка создания видео нажата")
                     timeBetweenFrames = getValidValue(textField.text)
                     val snapsCount = timeBetweenFrames * fps
-                    videoProcessor = VideoProcessor(queue, WIDTH, HEIGHT, timeBetweenFrames * (frameList.size - 1), fps)
-                    imageProducer = ImageProducer(0 ,queue, WIDTH, HEIGHT, frameList, snapsCount)
+
+
+                    for (i in 0 until PRODUCERS_COUNT){
+                        queueList.add(LinkedBlockingQueue(300))
+                        imageProducers.add(ImageProducer(i, PRODUCERS_COUNT ,queueList[i], WIDTH, HEIGHT, frameList, snapsCount))
+                        thread { imageProducers[i].run() }
+                    }
+                    videoProcessor = VideoProcessor(queueList, WIDTH, HEIGHT, timeBetweenFrames * (frameList.size - 1), fps)
                     thread { videoProcessor!!.run() }
-                    thread { imageProducer!!.run() }
+
+
+
                 }
             })
         }
@@ -263,7 +270,9 @@ class VideoWindow : JFrame() {
                     super.mouseClicked(e)
                     try {
                         videoProcessor!!.disable()
-                        imageProducer!!.disable()
+                        for (i in 0..PRODUCERS_COUNT){
+                            imageProducers[i].disable()
+                        }
                     } catch (e: InterruptedException) {
                         println("Interrupt")
                     }
