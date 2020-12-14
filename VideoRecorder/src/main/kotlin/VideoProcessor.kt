@@ -23,6 +23,26 @@ class VideoProcessor(
 
     private var disable = true
 
+    private val progressListeners: MutableList<(Double) -> Unit> = mutableListOf()
+
+    private val finishListeners: MutableList<() -> Unit> = mutableListOf()
+
+    fun addProgressListener(l: (Double) -> Unit){
+        progressListeners.add(l)
+    }
+    fun addFinishListener(l: () -> Unit){
+        finishListeners.add(l)
+    }
+
+    fun removeProgressListener(l: (Double) -> Unit){
+        progressListeners.remove(l)
+    }
+    fun removeFinishListener(l: () -> Unit){
+        finishListeners.remove(l)
+    }
+
+
+
     /**
      * Функция создания видео в потоке
      * @param fileName название файла вместе с форматом
@@ -97,6 +117,9 @@ class VideoProcessor(
                 i++
 
             }
+            progressListeners.forEach { pl ->
+                pl.invoke((i.toDouble()/(duration * fps)))
+            }
 
         }
         do {
@@ -105,6 +128,9 @@ class VideoProcessor(
         } while (packet.isComplete)
         /** Закрываем контейнер.*/
         muxer.close()
+        finishListeners.forEach { fl ->
+            fl.invoke()
+        }
         println("Создании видео завершено!")
     }
 
