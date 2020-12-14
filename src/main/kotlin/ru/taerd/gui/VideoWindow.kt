@@ -29,6 +29,9 @@ class VideoWindow : JFrame() {
     private val minSizeTextField = Dimension(80, 20)
     private val minSizeTextLabel = Dimension(220, 20)
 
+    private val minSizeProgressTextField = Dimension(150,20)
+    private val minSizeProgressBar = Dimension(150,20)
+
     //Компоненты для создания видео
     private val queue = LinkedBlockingQueue<BufferedImage>(300)
     private var videoProcessor: VideoProcessor? = null
@@ -47,6 +50,8 @@ class VideoWindow : JFrame() {
     private val stopButton = JButton("Остановить")
     private val textField = JTextField("10")
     private val textLabel = JLabel("Время между переходами по кадрам")
+    private val progressBar = JProgressBar(0,100)
+    private val progressTextLabel = JLabel("Процент выполнения")
 
     private val dlm = DefaultListModel<String>()
     private var list = JList(dlm)
@@ -57,13 +62,14 @@ class VideoWindow : JFrame() {
     private val frameList = mutableListOf<CartesianScreenPlane>()
 
     init {
-
         defaultCloseOperation.apply {
             isVisible = false
         }
         title = "Составление видео из кадров"
         minimumSize = Dimension(950, 700)
         videoPanel = VideoPanel()
+        progressBar.isVisible = false
+        progressTextLabel.isVisible = false
         layout = GroupLayout(contentPane).apply {
             setVerticalGroup(
                 createSequentialGroup()
@@ -136,8 +142,24 @@ class VideoWindow : JFrame() {
                                                 GroupLayout.DEFAULT_SIZE
                                             )
                                     )
+                                        .addGap(4)
+                                        .addGroup(
+                                                createParallelGroup()
+                                                        .addComponent(
+                                                                progressTextLabel,
+                                                                minSizeProgressTextField.height,
+                                                                minSizeProgressTextField.height,
+                                                                GroupLayout.DEFAULT_SIZE
+                                                        )
+                                                        .addGap(4)
+                                                        .addComponent(
+                                                                progressBar,
+                                                                minSizeProgressBar.height,
+                                                                minSizeProgressBar.height,
+                                                                GroupLayout.PREFERRED_SIZE
+                                                        )
+                                        )
                             )
-
                     )
                     .addGap(4)
             )
@@ -205,6 +227,23 @@ class VideoWindow : JFrame() {
                                         GroupLayout.DEFAULT_SIZE
                                     )
                             )
+                                .addGap(4)
+                                .addGroup(
+                                        createSequentialGroup()
+                                                .addComponent(
+                                                        progressTextLabel,
+                                                        minSizeProgressTextField.width,
+                                                        minSizeProgressTextField.width,
+                                                        GroupLayout.DEFAULT_SIZE
+                                                )
+                                                .addGap(4)
+                                                .addComponent(
+                                                        progressBar,
+                                                        minSizeProgressBar.width,
+                                                        minSizeProgressBar.width,
+                                                        GroupLayout.PREFERRED_SIZE
+                                                )
+                                )
                     )
                     .addGap(4)
             )
@@ -253,6 +292,10 @@ class VideoWindow : JFrame() {
                     imageProducer = ImageProducer(0 ,queue, WIDTH, HEIGHT, frameList, snapsCount)
                     thread { videoProcessor!!.run() }
                     thread { imageProducer!!.run() }
+
+                    //progressTextLabel.isVisible=true
+                    //progressBar.isVisible=true
+                    //progressBar.value=(persent)
                 }
             })
         }
