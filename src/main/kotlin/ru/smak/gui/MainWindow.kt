@@ -105,8 +105,12 @@ class MainWindow(Video: VideoWindow) : JFrame() {
 
                 override fun mousePressed(e: MouseEvent?) {
                     e?.let {
-                        mfp.isVisible = true
-                        mfp.startPoint = it.point
+                        if (it.button == MouseEvent.BUTTON1) {
+                            mfp.isVisible = true
+                            mfp.startPoint = it.point
+                        } else if (it.button == MouseEvent.BUTTON2) {
+
+                        }
                     }
                 }
                 override fun mouseReleased(e: MouseEvent?) {
