@@ -1,5 +1,6 @@
 package ru.smak.math.fractals
 
+import ru.smak.gui.graphics.Coords
 import ru.smak.math.Complex
 import kotlin.math.*
 
@@ -17,11 +18,26 @@ class Mandelbrot {
      * Количество итераций, в течение которых проверяется
      * принадлежность точки множеству
      */
-    var maxIters = 200
-    set(value) {
-        //Проверяем устанавливаемое значение на корректность
-        field = max(200, abs(value))
+    var maxIters = 35
+        private set(value) {
+            //Проверяем устанавливаемое значение на корректность
+            field = max(maxIters, abs(value))
+        }
+
+    /**
+     * Метод обновления максимального количества итераций
+     * @param new Новые значения границ плоскости
+     * @param old Старые значения границ плоскости
+     * @return обновленное количество итераций
+     */
+
+    fun updateMaxIterations(new: Coords, old: Coords): Int {
+        val newArea = abs(new.xMax-new.xMin) * abs(new.yMax-new.yMin)
+        val oldArea = abs(old.xMax-old.xMin) * abs(old.yMax-old.yMin)
+        maxIters = (maxIters * 0.1 * oldArea / newArea).toInt()
+        return maxIters
     }
+
 
     /**
      * Метод определения принадлежности точки множеству Мандельброта
