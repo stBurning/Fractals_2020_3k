@@ -17,6 +17,7 @@ import kotlin.concurrent.thread
  * Класс дополнительного окна,для создания видео по фреймам
  */
 class VideoWindow : JFrame() {
+
     private val minSizeVidePanel = Dimension(400, 400)
     private val minSizePlaneScroll = Dimension(200, 380)
 
@@ -29,12 +30,14 @@ class VideoWindow : JFrame() {
     private val minSizeTextField = Dimension(80, 20)
     private val minSizeTextLabel = Dimension(220, 20)
 
+    private val minSizeProgressTextField = Dimension(150,20)
+    private val minSizeProgressBar = Dimension(150,20)
+
     //Компоненты для создания видео
-    private val queue = LinkedBlockingQueue<BufferedImage>(300)
+    private val queueList = mutableListOf<LinkedBlockingQueue<BufferedImage>>()
     private var videoProcessor: VideoProcessor? = null
-    private var imageProducer: ImageProducer? = null
-    private var tVideoProcessor: Thread? = null
-    private var tImageProducer: Thread? = null
+    private var imageProducers = mutableListOf<ImageProducer>()
+    private val PRODUCERS_COUNT = 2
     private val fps = 60
     private val WIDTH = 1920
     private val HEIGHT = 1080
@@ -47,14 +50,13 @@ class VideoWindow : JFrame() {
     private val stopButton = JButton("Остановить")
     private val textField = JTextField("10")
     private val textLabel = JLabel("Время между переходами по кадрам")
-
     private val dlm = DefaultListModel<String>()
     private var list = JList(dlm)
     private var planeScroll = JScrollPane(list)
-
     private var timeBetweenFrames = 0
-
     private val frameList = mutableListOf<CartesianScreenPlane>()
+    private val progressBar = JProgressBar(0,100)
+    private val progressTextLabel = JLabel("Процент выполнения")
 
     init {
 
@@ -64,6 +66,8 @@ class VideoWindow : JFrame() {
         title = "Составление видео из кадров"
         minimumSize = Dimension(950, 700)
         videoPanel = VideoPanel()
+        progressBar.isVisible = false
+        progressTextLabel.isVisible = false
         layout = GroupLayout(contentPane).apply {
             setVerticalGroup(
                 createSequentialGroup()
@@ -136,8 +140,24 @@ class VideoWindow : JFrame() {
                                                 GroupLayout.DEFAULT_SIZE
                                             )
                                     )
+                                    .addGap(4)
+                                    .addGroup(
+                                        createParallelGroup()
+                                            .addComponent(
+                                                progressTextLabel,
+                                                minSizeProgressTextField.height,
+                                                minSizeProgressTextField.height,
+                                                GroupLayout.DEFAULT_SIZE
+                                            )
+                                            .addGap(4)
+                                            .addComponent(
+                                                progressBar,
+                                                minSizeProgressBar.height,
+                                                minSizeProgressBar.height,
+                                                GroupLayout.PREFERRED_SIZE
+                                            )
+                                    )
                             )
-
                     )
                     .addGap(4)
             )
@@ -205,6 +225,23 @@ class VideoWindow : JFrame() {
                                         GroupLayout.DEFAULT_SIZE
                                     )
                             )
+                            .addGap(4)
+                            .addGroup(
+                                createSequentialGroup()
+                                    .addComponent(
+                                        progressTextLabel,
+                                        minSizeProgressTextField.width,
+                                        minSizeProgressTextField.width,
+                                        GroupLayout.DEFAULT_SIZE
+                                    )
+                                    .addGap(4)
+                                    .addComponent(
+                                        progressBar,
+                                        minSizeProgressBar.width,
+                                        minSizeProgressBar.width,
+                                        GroupLayout.PREFERRED_SIZE
+                                    )
+                            )
                     )
                     .addGap(4)
             )
@@ -246,13 +283,43 @@ class VideoWindow : JFrame() {
             addMouseListener(object : MouseAdapter() {
                 override fun mouseClicked(e: MouseEvent?) {
                     super.mouseClicked(e)
-                    println("Кнопка создания видео нажата")
+                    startButton.isEnabled = false
+                    addFrameButton.isEnabled = false
+                    removeFrameButton.isEnabled = false
                     timeBetweenFrames = getValidValue(textField.text)
                     val snapsCount = timeBetweenFrames * fps
-                    videoProcessor = VideoProcessor(queue, WIDTH, HEIGHT, timeBetweenFrames * (frameList.size - 1), fps)
-                    imageProducer = ImageProducer(0 ,queue, WIDTH, HEIGHT, frameList, snapsCount)
+
+                    for (i in 0 until PRODUCERS_COUNT) {
+                        queueList.add(LinkedBlockingQueue(300))
+                        imageProducers.add(
+                            ImageProducer(
+                                i,
+                                PRODUCERS_COUNT,
+                                queueList[i],
+                                WIDTH,
+                                HEIGHT,
+                                frameList,
+                                snapsCount
+                            )
+                        )
+                        thread { imageProducers[i].run() }
+                    }
+                    videoProcessor = VideoProcessor(queueList, WIDTH, HEIGHT, timeBetweenFrames * (frameList.size - 1), fps)
+                    progressTextLabel.isVisible=true
+                    progressBar.isVisible=true
+                    videoProcessor!!.addProgressListener {
+                        progressBar.value=(it * 100).toInt()
+                        progressBar.repaint()
+                    }
+                    videoProcessor!!.addFinishListener {
+                        progressTextLabel.isVisible=false
+                        progressBar.isVisible=false
+                        startButton.isEnabled = true
+                        addFrameButton.isEnabled = true
+                        removeFrameButton.isEnabled = true
+                        JOptionPane.showMessageDialog(videoPanel, "Видео создано")
+                    }
                     thread { videoProcessor!!.run() }
-                    thread { imageProducer!!.run() }
                 }
             })
         }
@@ -261,14 +328,17 @@ class VideoWindow : JFrame() {
             addMouseListener(object : MouseAdapter() {
                 override fun mouseClicked(e: MouseEvent?) {
                     super.mouseClicked(e)
+                    startButton.isEnabled = true
+                    addFrameButton.isEnabled = true
+                    removeFrameButton.isEnabled = true
                     try {
-                        videoProcessor!!.disable()
-                        imageProducer!!.disable()
+                        videoProcessor?.disable()
+                        imageProducers.forEach { imageProducer ->
+                            imageProducer.disable()
+                        }
                     } catch (e: InterruptedException) {
-                        println("Interrupt")
+                        println("InterruptedException")
                     }
-
-                    //Блокировка и удаление потоков отрисовки фреймов
                 }
             })
         }

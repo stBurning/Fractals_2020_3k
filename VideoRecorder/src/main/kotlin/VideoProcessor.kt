@@ -8,13 +8,13 @@ import java.util.concurrent.LinkedBlockingQueue
 
 
 /** (Consumer) Класс, получающий через очередь изображения и собирающий их в видео
- * @param queue ConcurrentLinkedQueue - очередь, осуществляющая связь с (Producers)
+ * @param queues списпок ConcurrentLinkedQueue - очередей, осуществляющих связь с (Producers)
  * @param width ширина изображений
  * @param height высота изображений
  * @param duration длительность выидео
  * @param fps количество кадров в секунду*/
 class VideoProcessor(
-    private val queue: LinkedBlockingQueue<BufferedImage>,
+    private val queues: MutableList<LinkedBlockingQueue<BufferedImage>>,
     private val width: Int,
     private val height: Int,
     private val duration: Int,
@@ -22,6 +22,26 @@ class VideoProcessor(
 ) : Runnable {
 
     private var disable = true
+
+    private val progressListeners: MutableList<(Double) -> Unit> = mutableListOf()
+
+    private val finishListeners: MutableList<() -> Unit> = mutableListOf()
+
+    fun addProgressListener(l: (Double) -> Unit){
+        progressListeners.add(l)
+    }
+    fun addFinishListener(l: () -> Unit){
+        finishListeners.add(l)
+    }
+
+    fun removeProgressListener(l: (Double) -> Unit){
+        progressListeners.remove(l)
+    }
+    fun removeFinishListener(l: () -> Unit){
+        finishListeners.remove(l)
+    }
+
+
 
     /**
      * Функция создания видео в потоке
@@ -81,19 +101,26 @@ class VideoProcessor(
                 return
             }
             //Получаем изображение из очереди если оно доступно, иначе ждем
-            val img = queue.take()
-            val newImg = BufferedImage(width, height, BufferedImage.TYPE_INT_RGB)
-            newImg.graphics.drawImage(img, 0, 0, null)
-            /** Конвертируем изображение*/
-            val image = convertToType(newImg, BufferedImage.TYPE_3BYTE_BGR)
-            println("[Encoder] Изображение $i добавлено")
-            if (converter == null) converter = MediaPictureConverterFactory.createConverter(image, picture)
-            converter!!.toPicture(picture, image, i.toLong())
-            do {
-                encoder.encode(packet, picture)
-                if (packet.isComplete) muxer.write(packet, false)
-            } while (packet.isComplete)
-            i++
+            queues.forEach { queue ->
+                val img = queue.take()
+                val newImg = BufferedImage(width, height, BufferedImage.TYPE_INT_RGB)
+                newImg.graphics.drawImage(img, 0, 0, null)
+                /** Конвертируем изображение*/
+                val image = convertToType(newImg, BufferedImage.TYPE_3BYTE_BGR)
+                println("[Encoder] Изображение $i добавлено")
+                if (converter == null) converter = MediaPictureConverterFactory.createConverter(image, picture)
+                converter!!.toPicture(picture, image, i.toLong())
+                do {
+                    encoder.encode(packet, picture)
+                    if (packet.isComplete) muxer.write(packet, false)
+                } while (packet.isComplete)
+                i++
+
+            }
+            progressListeners.forEach { pl ->
+                pl.invoke((i.toDouble()/(duration * fps)))
+            }
+
         }
         do {
             encoder.encode(packet, null)
@@ -101,6 +128,9 @@ class VideoProcessor(
         } while (packet.isComplete)
         /** Закрываем контейнер.*/
         muxer.close()
+        finishListeners.forEach { fl ->
+            fl.invoke()
+        }
         println("Создании видео завершено!")
     }
 
