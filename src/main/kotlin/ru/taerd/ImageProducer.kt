@@ -47,7 +47,7 @@ class ImageProducer(
             val yMaxDt = abs(frameList[i].yMax - frameList[i + 1].yMax) / snapsCount
 
 
-            for (j in 0..snapsCount / producersCount) {
+            for (j in 0 until snapsCount / producersCount) {
                 if (disable) return
                 fractalPainter.plane.apply {
                     xMin = frameList[i].xMin + xMinDt * j * (producersCount) + xMinDt * index

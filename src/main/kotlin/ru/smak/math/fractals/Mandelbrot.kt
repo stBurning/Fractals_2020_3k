@@ -18,7 +18,7 @@ class Mandelbrot {
      * Количество итераций, в течение которых проверяется
      * принадлежность точки множеству
      */
-    var maxIters = 35
+    var maxIters = 200
         private set(value) {
             //Проверяем устанавливаемое значение на корректность
             field = max(maxIters, abs(value))
