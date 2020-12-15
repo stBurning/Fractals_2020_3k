@@ -15,7 +15,7 @@ class Menu(mw1: MainWindow): JFrame() {
     val bgClr = ButtonGroup()
     val detail = JCheckBox("Детализация ")
     val f1 : JRadioButtonMenuItem = JRadioButtonMenuItem("Множество Мандельброта")
-    val f2 = JRadioButtonMenuItem("Множество Жюлиа")
+    val f2 = JRadioButtonMenuItem("Множество Мандельброта 2")
     val bgF = ButtonGroup()
     init{
         //заполняем меню

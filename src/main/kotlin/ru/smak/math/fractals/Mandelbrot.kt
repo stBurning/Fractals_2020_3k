@@ -2,7 +2,10 @@ package ru.smak.math.fractals
 
 import ru.smak.gui.graphics.Coords
 import ru.smak.math.Complex
-import kotlin.math.*
+import kotlin.math.E
+import kotlin.math.abs
+import kotlin.math.log
+import kotlin.math.max
 
 /**
  * Класс множества Мандельброта
@@ -18,7 +21,7 @@ class Mandelbrot {
      * Количество итераций, в течение которых проверяется
      * принадлежность точки множеству
      */
-    var maxIters = 200
+    var maxIters = 100
         private set(value) {
             //Проверяем устанавливаемое значение на корректность
             field = max(maxIters, abs(value))
@@ -32,9 +35,9 @@ class Mandelbrot {
      */
 
     fun updateMaxIterations(new: Coords, old: Coords): Int {
-        val newArea = abs(new.xMax-new.xMin) * abs(new.yMax-new.yMin)
-        val oldArea = abs(old.xMax-old.xMin) * abs(old.yMax-old.yMin)
-        maxIters = (maxIters * 0.1 * oldArea / newArea).toInt()
+        val differenceX = abs(old.xMax - old.xMin) - abs(new.xMax - new.xMin)
+        val differenceY = abs(old.yMax - old.yMin) - abs(new.yMax - new.yMin)
+        maxIters += (differenceX * 300).toInt() + (differenceY * 300).toInt()
         return maxIters
     }
 
@@ -48,15 +51,31 @@ class Mandelbrot {
     fun isInSet(c: Complex): Float {
 
         val z = Complex()
-        for (i in 1..maxIters){
+        for (i in 1..maxIters) {
             z powAssign 2
             z += c
             if (z.abs2() > r2)
-                //return i.toFloat() - log2(log2(z.abs2())).toFloat()+4.0F
+            //return i.toFloat() - log2(log2(z.abs2())).toFloat()+4.0F
                 return i.toFloat() -
-                        log(log(z.abs(), E)/log(maxIters.toDouble(),E), E).toFloat()/
+                        log(log(z.abs(), E) / log(maxIters.toDouble(), E), E).toFloat() /
                         log(2.0, E).toFloat()
-                //i.toFloat()/maxIters.toFloat()
+            //i.toFloat()/maxIters.toFloat()
+        }
+        return 0F
+    }
+
+    fun isInSet1(c: Complex): Float {
+
+        val z = Complex()
+        for (i in 1..maxIters) {
+            z powAssign 3
+            z += c
+            if (z.abs2() > r2)
+            //return i.toFloat() - log2(log2(z.abs2())).toFloat()+4.0F
+                return i.toFloat() -
+                        log(log(z.abs(), E) / log(maxIters.toDouble(), E), E).toFloat() /
+                        log(2.0, E).toFloat()
+            //i.toFloat()/maxIters.toFloat()
         }
         return 0F
     }

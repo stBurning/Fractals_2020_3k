@@ -3,7 +3,9 @@ package ru.taerd
 import ru.smak.gui.graphics.FractalPainter
 import ru.smak.gui.graphics.colorScheme5
 import ru.smak.gui.graphics.convertation.CartesianScreenPlane
+import ru.smak.math.Complex
 import ru.smak.math.fractals.Mandelbrot
+import java.awt.Color
 import java.awt.image.BufferedImage
 import java.util.concurrent.LinkedBlockingQueue
 import kotlin.math.abs
@@ -16,12 +18,13 @@ class ImageProducer(
     private val HEIGHT: Int,
     frames: MutableList<CartesianScreenPlane>,
     private val snapsCount: Int,
+    private val fractalTest: ((Complex)->Float)?,
+    private val colorScheme: ((Float)->(Color))
 
     ) : Runnable {
 
     private val frameList = frames.subList(0, frames.size)
     private var disable = true
-    private val fractal: Mandelbrot = Mandelbrot()
     private val fractalPainter: FractalPainter = FractalPainter(
         CartesianScreenPlane(
             WIDTH,
@@ -31,8 +34,8 @@ class ImageProducer(
 
 
     private fun createImages(snapsCount: Int) {
-        fractalPainter.isInSet = fractal::isInSet
-        fractalPainter.getColor = ::colorScheme5
+        fractalPainter.isInSet = fractalTest
+        fractalPainter.getColor = colorScheme
         fractalPainter.plane.apply {
             realHeight = HEIGHT
             realWidth = WIDTH

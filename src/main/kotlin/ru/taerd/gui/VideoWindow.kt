@@ -13,6 +13,7 @@ import java.awt.image.BufferedImage
 import java.util.concurrent.LinkedBlockingQueue
 import javax.swing.*
 import kotlin.concurrent.thread
+import kotlin.system.exitProcess
 
 
 /**
@@ -61,6 +62,13 @@ class VideoWindow : JFrame() {
     private val progressTextLabel = JLabel("Процент выполнения")
 
     fun close(){
+        videoPanel.plane.apply {
+            xMin = -2.0
+            xMax = 1.0
+            yMin = -1.0
+            yMax = 1.0
+
+        }
         isVisible = false
         videoProcessor?.disable()
         imageProducers.forEach { pr ->
@@ -68,6 +76,7 @@ class VideoWindow : JFrame() {
         }
         imageProducers.clear()
         frameList.clear()
+        dlm.clear()
         progressBar.value = 0
         progressBar.isVisible = false
         progressTextLabel.isVisible = false
@@ -312,8 +321,9 @@ class VideoWindow : JFrame() {
                                 WIDTH,
                                 HEIGHT,
                                 frameList,
-                                snapsCount
-                            )
+                                snapsCount,
+                            videoPanel.fp.isInSet,
+                            videoPanel.fp.getColor)
                         )
                         thread { imageProducers[i].run() }
                     }

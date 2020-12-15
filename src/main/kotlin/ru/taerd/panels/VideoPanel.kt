@@ -14,7 +14,7 @@ class VideoPanel : GraphicsPanel() {
 
     val plane = CartesianScreenPlane(width, height, -2.0, 1.0, -1.0, 1.0)
     val fp = FractalPainter(plane)
-    private val fractal = Mandelbrot()
+    var fractal = Mandelbrot()
 
     init {
         this.border = EtchedBorder()

@@ -269,12 +269,12 @@ class MainWindow(Video: VideoWindow) : JFrame() {
     fun createMandelbrot(){
         title = "Построение множества Мандельброта"
         fp.isInSet = fractal::isInSet
+        video.videoPanel.fp.isInSet = fractal::isInSet
 
     }
     fun createJulia(){
-        title = "Построение множества Жюлия"
-
-        // тут для Жюлия так же как и в createMandelbrot()
-        //функции для fp!!!
+        title = "Построение множества Мандельброта1"
+        fp.isInSet = fractal::isInSet1
+        video.videoPanel.fp.isInSet = fractal::isInSet1
     }
 }
