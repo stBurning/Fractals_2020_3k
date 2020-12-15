@@ -35,7 +35,7 @@
       </configuration>
     </facet>
   </component>
-  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_15">
+  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_14">
     <output url="file://$MODULE_DIR$/../../VideoRecorder/build/classes/java/main" />
     <exclude-output />
     <content url="file://$MODULE_DIR$/../../VideoRecorder/src/main">

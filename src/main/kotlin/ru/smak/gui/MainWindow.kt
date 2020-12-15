@@ -17,6 +17,10 @@ import javax.swing.JFrame
 
 class MainWindow(Video: VideoWindow) : JFrame() {
 
+    var xA1 = 0.0
+    var xI1 = 0.0
+    var yA1 = 0.0
+    var yI1 = 0.0
     private val history = History()
     private val minSize = Dimension(300, 200)
     private val mainPanel: GraphicsPanel
@@ -82,8 +86,32 @@ class MainWindow(Video: VideoWindow) : JFrame() {
 
         with (mainPanel){
             background = Color.WHITE
+            val wM = mainPanel.width
+            val hM = mainPanel.height
+            ResetCoords()
             addComponentListener(object : ComponentAdapter() {
                 override fun componentResized(e: ComponentEvent?) {
+                    val wT = mainPanel.width.toFloat()/wM.toFloat()
+                    val hT = mainPanel.height.toFloat()/hM.toFloat()
+                    val te = wT/hT
+                    if (wT<1||hT<1) {
+                        if (mainPanel.width.toFloat()/mainPanel.height.toFloat()>= 1) {
+                            plane.yMin = yI1
+                            plane.yMax = yA1
+                            plane.xMin = xI1-Math.abs((1-te)*(xA1-xI1)/2)
+                            plane.xMax = xA1+Math.abs((1-te)*(xA1-xI1)/2)
+                        } else {
+                            plane.xMin = xI1
+                            plane.xMax = xA1
+                            plane.yMax = yA1+Math.abs((1/te-1)*(yA1-yI1)/2)
+                            plane.yMin = yI1-Math.abs((1/te-1)*(yA1-yI1)/2)
+                        }
+                    } else {
+                        plane.xMin = xI1-(wT-1)*(xA1-xI1)/2
+                        plane.xMax = xA1+(wT-1)*(xA1-xI1)/2
+                        plane.yMin = yI1-(hT-1)*(yA1-yI1)/2
+                        plane.yMax = yA1+(hT-1)*(yA1-yI1)/2
+                    }
                     plane.realWidth = mainPanel.width
                     plane.realHeight = mainPanel.height
                     mfp.g = mainPanel.graphics
@@ -118,6 +146,21 @@ class MainWindow(Video: VideoWindow) : JFrame() {
                                     val xMax = Converter.xScr2Crt(x + width, plane)
                                     val yMin = Converter.yScr2Crt(y + height, plane)
                                     val yMax = Converter.yScr2Crt(y, plane)
+                                    val xT =  xMax - xMin;
+                                    val yT = yMax - yMin;
+                                    val te = plane.height/plane.width;
+                                    if (xT*te>yT){
+                                        plane.xMin = xMin;
+                                        plane.xMax = xMin+xT;
+                                        plane.yMin = yMin-Math.abs(xT*te-yT)/2
+                                        plane.yMax = yMin+xT*te-Math.abs(xT*te-yT)/2
+                                    }
+                                    else{
+                                        plane.yMin = yMin;
+                                        plane.yMax = yMin+yT;
+                                        plane.xMin = xMin - Math.abs((yT/te-xT)/2);
+                                        plane.xMax = xMin+yT/te-Math.abs((yT/te-xT)/2);
+                                    }
                                     val new = Coords(xMin, xMax, yMin, yMax)
                                     if (updated) {
                                         fractal.updateMaxIterations(new, old)  //добавить флажок с менюшниками
@@ -147,12 +190,32 @@ class MainWindow(Video: VideoWindow) : JFrame() {
         }
     }
 
+    fun ResetCoords(){
+        xA1 = plane.xMax
+        xI1 = plane.xMin
+        yA1 = plane.yMax
+        yI1 = plane.yMin
+    }
+
     fun updatePlane(xMin: Double, xMax: Double, yMin: Double, yMax: Double) {
         plane.also {
-            it.xMin = xMin
-            it.xMax = xMax
-            it.yMin = yMin
-            it.yMax = yMax
+            var yI=yMin;var yA=yMax;var xI=xMin;var xA=xMax;
+            val xT=xA-xI;
+            val yT=yA-yI;
+            val te = mainPanel.width/mainPanel.height;
+            if(xT/te>yT){
+                yA=((1/te)*xT+yMin+yMax)/2;
+                yI=(yMin+yMax-(1/te)*xT)/2;
+            }
+            else{
+                xA=(te*yT+xMin+xMax)/2;
+                xI=(xMin+xMax-te*yT)/2;
+            }
+            it.xMin = xI
+            it.xMax = xA
+            it.yMin = yI
+            it.yMax = yA
+            ResetCoords()
         }
         video.videoPanel.plane.also {
             it.xMin = xMin

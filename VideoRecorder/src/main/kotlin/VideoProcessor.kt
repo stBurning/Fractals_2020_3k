@@ -5,6 +5,7 @@ import java.awt.AWTException
 import java.awt.image.BufferedImage
 import java.io.IOException
 import java.util.concurrent.LinkedBlockingQueue
+import kotlin.jvm.Throws
 
 
 /** (Consumer) Класс, получающий через очередь изображения и собирающий их в видео
