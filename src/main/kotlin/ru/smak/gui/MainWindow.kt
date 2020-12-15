@@ -17,15 +17,12 @@ import javax.swing.JFrame
 
 class MainWindow(Video: VideoWindow) : JFrame() {
 
-    var xA1 = 0.0
-    var xI1 = 0.0
-    var yA1 = 0.0
-    var yI1 = 0.0
     private val history = History()
     private val minSize = Dimension(300, 200)
     private val mainPanel: GraphicsPanel
     internal val fp: FractalPainter
     internal val plane:  CartesianScreenPlane
+    internal val plane1:  CartesianScreenPlane
     internal var updated: Boolean = false
     private val fractal = Mandelbrot()
 
@@ -74,6 +71,11 @@ class MainWindow(Video: VideoWindow) : JFrame() {
             -2.0, 1.0, -1.0, 1.0
         )
 
+        plane1 = CartesianScreenPlane(
+                mainPanel.width, mainPanel.height,
+                0.0, 0.0, 0.0, 0.0
+        )
+
 
         val mfp = SelectionFramePainter(mainPanel.graphics)
         val fractal = Mandelbrot()
@@ -96,21 +98,21 @@ class MainWindow(Video: VideoWindow) : JFrame() {
                     val te = wT/hT
                     if (wT<1||hT<1) {
                         if (mainPanel.width.toFloat()/mainPanel.height.toFloat()>= 1) {
-                            plane.yMin = yI1
-                            plane.yMax = yA1
-                            plane.xMin = xI1-Math.abs((1-te)*(xA1-xI1)/2)
-                            plane.xMax = xA1+Math.abs((1-te)*(xA1-xI1)/2)
+                            plane.yMin = plane1.yMin
+                            plane.yMax = plane1.yMax
+                            plane.xMin = plane1.xMin-Math.abs((1-te)*(plane1.xMax-plane1.xMin)/2)
+                            plane.xMax = plane1.xMax+Math.abs((1-te)*(plane1.xMax-plane1.xMin)/2)
                         } else {
-                            plane.xMin = xI1
-                            plane.xMax = xA1
-                            plane.yMax = yA1+Math.abs((1/te-1)*(yA1-yI1)/2)
-                            plane.yMin = yI1-Math.abs((1/te-1)*(yA1-yI1)/2)
+                            plane.xMin = plane1.xMin
+                            plane.xMax = plane1.xMax
+                            plane.yMax = plane1.yMax+Math.abs((1/te-1)*(plane1.yMax-plane1.yMin)/2)
+                            plane.yMin = plane1.yMin-Math.abs((1/te-1)*(plane1.yMax-plane1.yMin)/2)
                         }
                     } else {
-                        plane.xMin = xI1-(wT-1)*(xA1-xI1)/2
-                        plane.xMax = xA1+(wT-1)*(xA1-xI1)/2
-                        plane.yMin = yI1-(hT-1)*(yA1-yI1)/2
-                        plane.yMax = yA1+(hT-1)*(yA1-yI1)/2
+                        plane.xMin = plane1.xMin-(wT-1)*(plane1.xMax-plane1.xMin)/2
+                        plane.xMax = plane1.xMax+(wT-1)*(plane1.xMax-plane1.xMin)/2
+                        plane.yMin = plane1.yMin-(hT-1)*(plane1.yMax-plane1.yMin)/2
+                        plane.yMax = plane1.yMax+(hT-1)*(plane1.yMax-plane1.yMin)/2
                     }
                     plane.realWidth = mainPanel.width
                     plane.realHeight = mainPanel.height
@@ -191,10 +193,10 @@ class MainWindow(Video: VideoWindow) : JFrame() {
     }
 
     fun ResetCoords(){
-        xA1 = plane.xMax
-        xI1 = plane.xMin
-        yA1 = plane.yMax
-        yI1 = plane.yMin
+        plane1.xMax = plane.xMax
+        plane1.xMin = plane.xMin
+        plane1.yMax = plane.yMax
+        plane1.yMin = plane.yMin
     }
 
     fun updatePlane(xMin: Double, xMax: Double, yMin: Double, yMax: Double) {
