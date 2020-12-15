@@ -7,6 +7,8 @@ import ru.taerd.panels.VideoPanel
 import java.awt.Dimension
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
+import java.awt.event.WindowAdapter
+import java.awt.event.WindowListener
 import java.awt.image.BufferedImage
 import java.util.concurrent.LinkedBlockingQueue
 import javax.swing.*
@@ -30,8 +32,8 @@ class VideoWindow : JFrame() {
     private val minSizeTextField = Dimension(80, 20)
     private val minSizeTextLabel = Dimension(220, 20)
 
-    private val minSizeProgressTextField = Dimension(150,20)
-    private val minSizeProgressBar = Dimension(150,20)
+    private val minSizeProgressTextField = Dimension(150, 20)
+    private val minSizeProgressBar = Dimension(150, 20)
 
     //Компоненты для создания видео
     private val queueList = mutableListOf<LinkedBlockingQueue<BufferedImage>>()
@@ -55,14 +57,25 @@ class VideoWindow : JFrame() {
     private var planeScroll = JScrollPane(list)
     private var timeBetweenFrames = 0
     private val frameList = mutableListOf<CartesianScreenPlane>()
-    private val progressBar = JProgressBar(0,100)
+    private val progressBar = JProgressBar(0, 100)
     private val progressTextLabel = JLabel("Процент выполнения")
+
+    fun close(){
+        isVisible = false
+        videoProcessor?.disable()
+        imageProducers.forEach { pr ->
+            pr.disable()
+        }
+        imageProducers.clear()
+        frameList.clear()
+        progressBar.value = 0
+        progressBar.isVisible = false
+        progressTextLabel.isVisible = false
+        dispose()
+    }
 
     init {
 
-        defaultCloseOperation.apply {
-            isVisible = false
-        }
         title = "Составление видео из кадров"
         minimumSize = Dimension(950, 700)
         videoPanel = VideoPanel()
@@ -304,16 +317,17 @@ class VideoWindow : JFrame() {
                         )
                         thread { imageProducers[i].run() }
                     }
-                    videoProcessor = VideoProcessor(queueList, WIDTH, HEIGHT, timeBetweenFrames * (frameList.size - 1), fps)
-                    progressTextLabel.isVisible=true
-                    progressBar.isVisible=true
+                    videoProcessor =
+                        VideoProcessor(queueList, WIDTH, HEIGHT, timeBetweenFrames * (frameList.size - 1), fps)
+                    progressTextLabel.isVisible = true
+                    progressBar.isVisible = true
                     videoProcessor!!.addProgressListener {
-                        progressBar.value=(it * 100).toInt()
+                        progressBar.value = (it * 100).toInt()
                         progressBar.repaint()
                     }
                     videoProcessor!!.addFinishListener {
-                        progressTextLabel.isVisible=false
-                        progressBar.isVisible=false
+                        progressTextLabel.isVisible = false
+                        progressBar.isVisible = false
                         startButton.isEnabled = true
                         addFrameButton.isEnabled = true
                         removeFrameButton.isEnabled = true
