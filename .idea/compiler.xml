@@ -5,7 +5,6 @@
       <module name="ImagesToVideoConverter" target="15" />
       <module name="ScreenRecorder.main" target="15" />
       <module name="ScreenRecorder.test" target="15" />
-      <module name="VideoRecorder" target="15" />
       <module name="VideoRecorder.main" target="15" />
       <module name="VideoRecorder.test" target="15" />
     </bytecodeTargetLevel>
