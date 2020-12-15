@@ -4,6 +4,7 @@ import ru.smak.gui.components.GraphicsPanel
 import ru.smak.gui.graphics.*
 import ru.smak.gui.graphics.convertation.CartesianScreenPlane
 import ru.smak.gui.graphics.convertation.Converter
+import ru.smak.julia.JuliaSetWindow
 import ru.smak.math.fractals.Mandelbrot
 import ru.taerd.gui.VideoWindow
 import java.awt.Color
@@ -21,8 +22,8 @@ class MainWindow(Video: VideoWindow) : JFrame() {
     private val mainPanel: GraphicsPanel
     internal val fp: FractalPainter
     internal val plane:  CartesianScreenPlane
-    internal var updated:Boolean=false
-    val fractal = Mandelbrot()
+    internal var updated: Boolean = false
+    private val fractal = Mandelbrot()
 
     /*
     Экземпляр класса videoWindow
@@ -37,11 +38,9 @@ class MainWindow(Video: VideoWindow) : JFrame() {
     video.videoPanel.fractal.maxIters = value
     */
     internal val video = Video
+    private val juliaSetWindow = JuliaSetWindow()
 
-//    private val buttonBack = JButton("Назад")
-//    private val buttonReset = JButton("Сбросить")
     init{
-
         defaultCloseOperation = EXIT_ON_CLOSE
         title = "Построение множества Мандельброта"
         minimumSize = Dimension(600, 600)
@@ -71,23 +70,13 @@ class MainWindow(Video: VideoWindow) : JFrame() {
             -2.0, 1.0, -1.0, 1.0
         )
 
+
         val mfp = SelectionFramePainter(mainPanel.graphics)
-
-        //createMandelbrot()
-       // fractal = Mandelbrot()
-
-
-
         val fractal = Mandelbrot()
         fp = FractalPainter(plane)
 
         val menu = Menu(this)
         jMenuBar = menu.jMenuBar
-
-
-
-
-
 
         fp.addImageReadyListener { mainPanel.repaint() }
 
@@ -99,66 +88,63 @@ class MainWindow(Video: VideoWindow) : JFrame() {
                     plane.realHeight = mainPanel.height
                     mfp.g = mainPanel.graphics
                     mainPanel.repaint()
+
                 }
             })
             addMouseListener(object : MouseAdapter() {
-
                 override fun mousePressed(e: MouseEvent?) {
                     e?.let {
                         if (it.button == MouseEvent.BUTTON1) {
                             mfp.isVisible = true
                             mfp.startPoint = it.point
-                        } else if (it.button == MouseEvent.BUTTON2) {
-
+                        } else if (it.button == MouseEvent.BUTTON3) {
+                            if (juliaSetWindow.isLaunched.not()) {
+                                juliaSetWindow.launch()
+                            }
+                            juliaSetWindow.updateState(Converter.xScr2Crt(it.x, plane), Converter.yScr2Crt(it.y, plane))
                         }
                     }
                 }
                 override fun mouseReleased(e: MouseEvent?) {
                     e?.let {
-                        mfp.currentPoint = it.point
-                    }
-                    mfp.isVisible = false
-                    mfp.selectionRect?.apply {
-                        if (width > 3 && height > 3) {
-                            history.add(Coords(plane.xMin, plane.xMax, plane.yMin, plane.yMax))
-                            val old = Coords(plane.xMin,plane.xMax,plane.yMin,plane.yMax)
-                            val xMin = Converter.xScr2Crt(x, plane)
-                            val xMax = Converter.xScr2Crt(x + width, plane)
-                            val yMin = Converter.yScr2Crt(y + height, plane)
-                            val yMax = Converter.yScr2Crt(y, plane)
-                            val new = Coords(xMin,xMax,yMin,yMax)
-                            if(updated) {
-                                fractal.updateMaxIterations(new, old)  //добавить флажок с менюшниками
+                        if (it.button == MouseEvent.BUTTON1) {
+                            mfp.currentPoint = e.point
+                            mfp.isVisible = false
+                            mfp.selectionRect?.apply {
+                                if (width > 3 && height > 3) {
+                                    history.add(Coords(plane.xMin, plane.xMax, plane.yMin, plane.yMax))
+                                    val old = Coords(plane.xMin, plane.xMax, plane.yMin, plane.yMax)
+                                    val xMin = Converter.xScr2Crt(x, plane)
+                                    val xMax = Converter.xScr2Crt(x + width, plane)
+                                    val yMin = Converter.yScr2Crt(y + height, plane)
+                                    val yMax = Converter.yScr2Crt(y, plane)
+                                    val new = Coords(xMin, xMax, yMin, yMax)
+                                    if (updated) {
+                                        fractal.updateMaxIterations(new, old)  //добавить флажок с менюшниками
+                                    }
+                                    updatePlane(xMin, xMax, yMin, yMax)
+                                }
                             }
-                            updatePlane(xMin, xMax, yMin, yMax)
+                            repaint()
+                        } else if (it.button == MouseEvent.BUTTON3) {
+                            juliaSetWindow.updateState(Converter.xScr2Crt(it.x, plane), Converter.yScr2Crt(it.y, plane))
                         }
                     }
-                    repaint()
                 }
             })
             addMouseMotionListener(object : MouseMotionAdapter() {
                 override fun mouseDragged(e: MouseEvent?) {
                     e?.let {
-                        mfp.currentPoint = it.point
+                        if (it.button == MouseEvent.BUTTON1) {
+                            mfp.currentPoint = e.point
+                        } else if (it.button == MouseEvent.BUTTON3) {
+                            juliaSetWindow.updateState(Converter.xScr2Crt(it.x, plane), Converter.yScr2Crt(it.y, plane))
+                        }
                     }
                 }
             })
-
-//            SaveFractal.invoke(plane, fp.savedImage, true, "colorScheme1") //сначала нужно сделать пункт меню, потом перенести эту строку в обработчик нажатия на кнопку
-//            buttonBack.addActionListener {
-//                onUndo()
-//            }
-//            buttonBack.mnemonic = KeyEvent.VK_Z  // сначала нужно сделать пункт меню, а потом к нему добавить мнемонику: menuItem.mnemonic = KeyEvent.VK_Z
-//            buttonReset.addActionListener {
-//                onReset()
-//            }
-//            buttonReset.mnemonic = KeyEvent.VK_R  // сначала нужно сделать пункт меню, а потом к нему добавить мнемонику:  menuItem.mnemonic = KeyEvent.VK_R
-
             addPainter(fp)
-
-
         }
-
     }
 
     fun updatePlane(xMin: Double, xMax: Double, yMin: Double, yMax: Double) {
@@ -191,21 +177,29 @@ class MainWindow(Video: VideoWindow) : JFrame() {
     }
 
     fun changeColorScheme(i: Int){
-        if(i ==1){
-            fp.getColor = ::colorScheme1
-            video.videoPanel.fp.getColor= ::colorScheme1
-        }
-        if(i==2){
-            fp.getColor = ::colorScheme2
-            video.videoPanel.fp.getColor= ::colorScheme2
-        }
-        if(i==3){
-            fp.getColor = ::colorScheme3
-            video.videoPanel.fp.getColor= ::colorScheme3
-        }
-        if(i==4){
-            fp.getColor = ::colorScheme4
-            video.videoPanel.fp.getColor= ::colorScheme4
+        when (i) {
+            1 -> {
+                fp.getColor = ::colorScheme1
+                video.videoPanel.fp.getColor = ::colorScheme1
+                juliaSetWindow.colorScheme = 1
+            }
+            2 -> {
+                fp.getColor = ::colorScheme2
+                video.videoPanel.fp.getColor = ::colorScheme2
+
+            }
+            3 -> {
+                fp.getColor = ::colorScheme3
+                video.videoPanel.fp.getColor = ::colorScheme3
+            }
+            4 -> {
+                fp.getColor = ::colorScheme4
+                video.videoPanel.fp.getColor = ::colorScheme4
+            }
+            5 -> {
+                fp.getColor = ::colorScheme5
+                video.videoPanel.fp.getColor = ::colorScheme5
+            }
         }
         repaint()
     }

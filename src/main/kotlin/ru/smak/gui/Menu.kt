@@ -14,9 +14,9 @@ class Menu(mw1: MainWindow): JFrame() {
     val mw: MainWindow = mw1
     val bgClr = ButtonGroup()
     val detail = JCheckBox("Детализация ")
-    val f1 : JRadioButtonMenuItem
+    val f1 : JRadioButtonMenuItem = JRadioButtonMenuItem("Множество Мандельброта")
+
     init{
-        f1 = JRadioButtonMenuItem("Множество Мандельброта")
         //заполняем меню
         fillMenuBar()
         jMenuBar = menuBar
@@ -36,7 +36,7 @@ class Menu(mw1: MainWindow): JFrame() {
         menuBar.add(Box.createHorizontalGlue())//пробел
         //поле с галочкой для детализации
 
-        detail.addActionListener{
+        detail.addActionListener {
             mw.updated = detail.isSelected
         }
         menuBar.add(detail)
@@ -78,8 +78,7 @@ class Menu(mw1: MainWindow): JFrame() {
                         break
                     }
                 }
-                if (sd.detail) detail.isSelected =true
-                else detail.isSelected = false
+                detail.isSelected = sd.detail
             }
 
         }
@@ -113,18 +112,21 @@ class Menu(mw1: MainWindow): JFrame() {
 
         // меню-переключатели для цветов
         val clr1 = JRadioButtonMenuItem("Цветовая схема 1")
-        clr1.setActionCommand("colorScheme1")
+        clr1.actionCommand = "colorScheme1"
         val clr2 = JRadioButtonMenuItem("Цветовая схема 2")
-        clr2.setActionCommand("colorScheme2")
+        clr2.actionCommand = "colorScheme2"
         val clr3 = JRadioButtonMenuItem("Цветовая схема 3")
-        clr3.setActionCommand("colorScheme3")
+        clr3.actionCommand = "colorScheme3"
         val clr4 = JRadioButtonMenuItem("Цветовая схема 4")
-        clr4.setActionCommand("colorScheme4")
+        clr4.actionCommand = "colorScheme4"
+        val clr5 = JRadioButtonMenuItem("Цветовая схема 5")
+        clr5.actionCommand = "colorScheme5"
 
         clr1.addActionListener { mw.changeColorScheme(1) }
         clr2.addActionListener { mw.changeColorScheme(2) }
         clr3.addActionListener { mw.changeColorScheme(3) }
         clr4.addActionListener { mw.changeColorScheme(4) }
+        clr5.addActionListener { mw.changeColorScheme(5) }
         clr1.doClick()
         // организуем переключатели в логическую группу
 
@@ -132,10 +134,12 @@ class Menu(mw1: MainWindow): JFrame() {
         bgClr.add(clr2)
         bgClr.add(clr3)
         bgClr.add(clr4)
+        bgClr.add(clr5)
         clrSchemes.add(clr1)
         clrSchemes.add(clr2)
         clrSchemes.add(clr3)
         clrSchemes.add(clr4)
+        clrSchemes.add(clr5)
         bgClr.selection.actionCommand
 
         //меню-переключатели для выбора фрактала
@@ -145,11 +149,12 @@ class Menu(mw1: MainWindow): JFrame() {
         }
         f1.doClick()
         val f2 = JRadioButtonMenuItem("Множество Жюлиа")
+        f2.isEnabled = false
         f2.addActionListener {
             mw.createJulia()
         }
         // организуем переключатели в логическую группу
-        val bgF = ButtonGroup();
+        val bgF = ButtonGroup()
         bgF.add(f1)
         bgF.add(f2)
         fractal.add(f1)
@@ -159,7 +164,7 @@ class Menu(mw1: MainWindow): JFrame() {
         editMenu.add(clrSchemes)
         editMenu.add(JSeparator()) //разделитель
         editMenu.add(fractal)
-        return editMenu;
+        return editMenu
     }
 
 
