@@ -15,7 +15,8 @@ class Menu(mw1: MainWindow): JFrame() {
     val bgClr = ButtonGroup()
     val detail = JCheckBox("Детализация ")
     val f1 : JRadioButtonMenuItem = JRadioButtonMenuItem("Множество Мандельброта")
-
+    val f2 = JRadioButtonMenuItem("Множество Жюлиа")
+    val bgF = ButtonGroup()
     init{
         //заполняем меню
         fillMenuBar()
@@ -79,6 +80,8 @@ class Menu(mw1: MainWindow): JFrame() {
                     }
                 }
                 detail.isSelected = sd.detail
+                if( bgF.selection.actionCommand=="1"){f1.doClick()}
+                else(f2.doClick())
             }
 
         }
@@ -87,7 +90,7 @@ class Menu(mw1: MainWindow): JFrame() {
         //Подпункты "Сохранить как..."
         val format1 = JMenuItem("Собственный формат", ImageIcon("icons/imagefile.png"))
         format1.addActionListener {
-            val sd = SaveData( mw.plane.xMin, mw.plane.xMax, mw.plane.yMin, mw.plane.yMax,bgClr.selection.actionCommand,detail.isSelected )
+            val sd = SaveData( mw.plane.xMin, mw.plane.xMax, mw.plane.yMin, mw.plane.yMax,bgClr.selection.actionCommand,detail.isSelected,bgF.selection.actionCommand.toInt() )
             val s = SaveFormat(sd)
             f1.doClick()
 
@@ -147,18 +150,22 @@ class Menu(mw1: MainWindow): JFrame() {
         f1.addActionListener {
             mw.createMandelbrot()
         }
+        f1.actionCommand="1"
         f1.doClick()
-        val f2 = JRadioButtonMenuItem("Множество Жюлиа")
-        f2.isEnabled = false
+
+        f2.actionCommand="2"
+        //f2.isEnabled = false
         f2.addActionListener {
             mw.createJulia()
         }
+
         // организуем переключатели в логическую группу
-        val bgF = ButtonGroup()
+
         bgF.add(f1)
         bgF.add(f2)
         fractal.add(f1)
         fractal.add(f2)
+        bgF.selection.actionCommand
 
         // добавим все в меню
         editMenu.add(clrSchemes)
