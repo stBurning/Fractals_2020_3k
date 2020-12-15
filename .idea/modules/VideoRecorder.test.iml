@@ -8,7 +8,7 @@
         </compilerSettings>
         <compilerArguments>
           <option name="destination" value="$MODULE_DIR$/../../VideoRecorder/build/classes/kotlin/test" />
-          <option name="classpath" value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.humble/humble-video-all/0.3.0/fdd45396c3f340f12d48ab541b32f3a4a2c87217/humble-video-all-0.3.0.jar;C:/Users/chama/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib/1.4.10/ea29e063d2bbe695be13e9d044dcfb0c7add398e/kotlin-stdlib-1.4.10.jar;C:/Users/chama/.gradle/caches/modules-2/files-2.1/io.humble/humble-video-noarch/0.3.0/66cc41eabe73c8e70a19f03d4cf1e8f4e728e948/humble-video-noarch-0.3.0.jar;C:/Users/chama/.gradle/caches/modules-2/files-2.1/io.humble/humble-video-arch-i686-w64-mingw32/0.3.0/b9e69fd5806e6488d6a6ad0cbc01ac2846147758/humble-video-arch-i686-w64-mingw32-0.3.0.jar;C:/Users/chama/.gradle/caches/modules-2/files-2.1/io.humble/humble-video-arch-x86_64-w64-mingw32/0.3.0/23533c2306c445ca0f19ee94cd4e39069ac46e76/humble-video-arch-x86_64-w64-mingw32-0.3.0.jar;C:/Users/chama/.gradle/caches/modules-2/files-2.1/io.humble/humble-video-arch-x86_64-apple-darwin18/0.3.0/ae8acf237b3eb06335491acc68777d0b413a0e2c/humble-video-arch-x86_64-apple-darwin18-0.3.0.jar;C:/Users/chama/.gradle/caches/modules-2/files-2.1/io.humble/humble-video-arch-i686-pc-linux-gnu6/0.3.0/476f6a8eaed72777a56df17f8254efb252aebf72/humble-video-arch-i686-pc-linux-gnu6-0.3.0.jar;C:/Users/chama/.gradle/caches/modules-2/files-2.1/io.humble/humble-video-arch-x86_64-pc-linux-gnu6/0.3.0/cbb978e7a0ea7657b1a776b83decfd6dce2e0251/humble-video-arch-x86_64-pc-linux-gnu6-0.3.0.jar;C:/Users/chama/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib-common/1.4.10/6229be3465805c99db1142ad75e6c6ddeac0b04c/kotlin-stdlib-common-1.4.10.jar;C:/Users/chama/.gradle/caches/modules-2/files-2.1/org.jetbrains/annotations/13.0/919f0dfe192fb4e063e7dacadee7f8bb9a2672a9/annotations-13.0.jar;C:/Users/chama/.gradle/caches/modules-2/files-2.1/org.slf4j/slf4j-api/1.7.5/6b262da268f8ad9eff941b25503a9198f0a0ac93/slf4j-api-1.7.5.jar" />
+          <option name="classpath" value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.humble/humble-video-all/0.3.0/fdd45396c3f340f12d48ab541b32f3a4a2c87217/humble-video-all-0.3.0.jar;C:/Users/Марина/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib/1.4.10/ea29e063d2bbe695be13e9d044dcfb0c7add398e/kotlin-stdlib-1.4.10.jar;C:/Users/Марина/.gradle/caches/modules-2/files-2.1/io.humble/humble-video-noarch/0.3.0/66cc41eabe73c8e70a19f03d4cf1e8f4e728e948/humble-video-noarch-0.3.0.jar;C:/Users/Марина/.gradle/caches/modules-2/files-2.1/io.humble/humble-video-arch-i686-w64-mingw32/0.3.0/b9e69fd5806e6488d6a6ad0cbc01ac2846147758/humble-video-arch-i686-w64-mingw32-0.3.0.jar;C:/Users/Марина/.gradle/caches/modules-2/files-2.1/io.humble/humble-video-arch-x86_64-w64-mingw32/0.3.0/23533c2306c445ca0f19ee94cd4e39069ac46e76/humble-video-arch-x86_64-w64-mingw32-0.3.0.jar;C:/Users/Марина/.gradle/caches/modules-2/files-2.1/io.humble/humble-video-arch-x86_64-apple-darwin18/0.3.0/ae8acf237b3eb06335491acc68777d0b413a0e2c/humble-video-arch-x86_64-apple-darwin18-0.3.0.jar;C:/Users/Марина/.gradle/caches/modules-2/files-2.1/io.humble/humble-video-arch-i686-pc-linux-gnu6/0.3.0/476f6a8eaed72777a56df17f8254efb252aebf72/humble-video-arch-i686-pc-linux-gnu6-0.3.0.jar;C:/Users/Марина/.gradle/caches/modules-2/files-2.1/io.humble/humble-video-arch-x86_64-pc-linux-gnu6/0.3.0/cbb978e7a0ea7657b1a776b83decfd6dce2e0251/humble-video-arch-x86_64-pc-linux-gnu6-0.3.0.jar;C:/Users/Марина/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib-common/1.4.10/6229be3465805c99db1142ad75e6c6ddeac0b04c/kotlin-stdlib-common-1.4.10.jar;C:/Users/Марина/.gradle/caches/modules-2/files-2.1/org.jetbrains/annotations/13.0/919f0dfe192fb4e063e7dacadee7f8bb9a2672a9/annotations-13.0.jar;C:/Users/Марина/.gradle/caches/modules-2/files-2.1/org.slf4j/slf4j-api/1.7.5/6b262da268f8ad9eff941b25503a9198f0a0ac93/slf4j-api-1.7.5.jar" />
           <option name="noStdlib" value="true" />
           <option name="noReflect" value="true" />
           <option name="moduleName" value="VideoRecorder" />
@@ -41,25 +41,6 @@
         </compilerArguments>
       </configuration>
     </facet>
-  </component>
-  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_15">
-    <output-test url="file://$MODULE_DIR$/../../VideoRecorder/build/classes/java/test" />
-    <exclude-output />
-    <content url="file://$MODULE_DIR$/../../VideoRecorder/src/test" />
-    <orderEntry type="inheritedJdk" />
-    <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module" module-name="VideoRecorder.main" />
-    <orderEntry type="library" name="Gradle: io.humble:humble-video-all:0.3.0" level="project" />
-    <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib:1.4.10" level="project" />
-    <orderEntry type="library" name="Gradle: io.humble:humble-video-noarch:0.3.0" level="project" />
-    <orderEntry type="library" name="Gradle: io.humble:humble-video-arch-i686-w64-mingw32:0.3.0" level="project" />
-    <orderEntry type="library" name="Gradle: io.humble:humble-video-arch-x86_64-w64-mingw32:0.3.0" level="project" />
-    <orderEntry type="library" name="Gradle: io.humble:humble-video-arch-x86_64-apple-darwin18:0.3.0" level="project" />
-    <orderEntry type="library" name="Gradle: io.humble:humble-video-arch-i686-pc-linux-gnu6:0.3.0" level="project" />
-    <orderEntry type="library" name="Gradle: io.humble:humble-video-arch-x86_64-pc-linux-gnu6:0.3.0" level="project" />
-    <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib-common:1.4.10" level="project" />
-    <orderEntry type="library" name="Gradle: org.jetbrains:annotations:13.0" level="project" />
-    <orderEntry type="library" name="Gradle: org.slf4j:slf4j-api:1.7.5" level="project" />
   </component>
   <component name="TestModuleProperties" production-module="VideoRecorder.main" />
 </module>

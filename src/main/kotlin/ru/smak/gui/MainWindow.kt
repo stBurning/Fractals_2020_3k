@@ -210,31 +210,8 @@ class MainWindow(Video: VideoWindow) : JFrame() {
     }
     fun createJulia(){
         title = "Построение множества Жюлия"
+
         // тут для Жюлия так же как и в createMandelbrot()
         //функции для fp!!!
-    }
-    //sd:SaveData
-    fun open(){
-        val plane1 = CartesianScreenPlane(
-                mainPanel.width, mainPanel.height,
-                -2.0, 1.0, -1.0, 1.0
-        )
-        fp.plane.let {
-            it.xMin = -2.0
-            it.xMax = 1.0
-            it.yMin = -1.0
-            it.yMax = 1.0
-        }
-
-        /*
-        в итоге будет так
-        fp.plane.let {
-            it.xMin = sd.xMin
-            it.xMax = sd.xMax
-            it.yMin = sd.yMin
-            it.yMax = sd.yMax
-        }*/
-        changeColorScheme(3)
-        createMandelbrot()
     }
 }

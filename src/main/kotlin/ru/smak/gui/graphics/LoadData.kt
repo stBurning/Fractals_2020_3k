@@ -61,23 +61,6 @@ object LoadData{
         }
         return null
     }
-    fun open(fp: FractalPainter, sd:SaveData, list: Enumeration<AbstractButton>){
-
-        fp.plane.let {
-            it.xMin = sd.xMin
-            it.xMax = sd.xMax
-            it.yMin = sd.yMin
-            it.yMax = sd.yMax
-        }
-
-        for (i in list){
-            if(i.name == sd.color){
-                i.doClick()
-                break
-            }
-        }
-
-    }
 
 }
 

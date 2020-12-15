@@ -19,9 +19,10 @@ data class SaveData(
         var yMin: Double,
         var yMax: Double,
         var color: String,
-        var detail: Boolean
+        var detail: Boolean,
+        var method: Int
 ):Serializable{
-    override fun toString() = "$xMin,$xMax,$yMin,$yMax,$color,$detail"
+    override fun toString() = "$xMin,$xMax,$yMin,$yMax,$color,$detail, $method"
 }
 class SaveFormat( sd: SaveData){
 
